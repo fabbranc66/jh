@@ -81,7 +81,14 @@ final class ProductRepository
     {
         $statement = $this->pdo->prepare(
             'SELECT p.id, p.name, p.slug, p.sku, p.short_description, p.price_label,
-                    p.is_customizable, p.is_featured, c.name AS category_name, c.slug AS category_slug
+                    p.is_customizable, p.is_featured, c.name AS category_name, c.slug AS category_slug,
+                    (
+                        SELECT pi.image_path
+                        FROM product_images pi
+                        WHERE pi.product_id = p.id
+                        ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.id ASC
+                        LIMIT 1
+                    ) AS primary_image_path
              FROM products p
              INNER JOIN categories c ON c.id = p.category_id
              WHERE p.status = :status AND c.is_active = 1
@@ -100,7 +107,14 @@ final class ProductRepository
         $statement = $this->pdo->prepare(
             'SELECT p.id, p.name, p.slug, p.sku, p.short_description, p.description, p.materials,
                     p.technique, p.price_label, p.is_customizable, p.is_featured,
-                    c.name AS category_name, c.slug AS category_slug
+                    c.name AS category_name, c.slug AS category_slug,
+                    (
+                        SELECT pi.image_path
+                        FROM product_images pi
+                        WHERE pi.product_id = p.id
+                        ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.id ASC
+                        LIMIT 1
+                    ) AS primary_image_path
              FROM products p
              INNER JOIN categories c ON c.id = p.category_id
              WHERE p.category_id = :category_id
@@ -122,7 +136,7 @@ final class ProductRepository
         $statement = $this->pdo->prepare(
             'SELECT p.id, p.name, p.slug, p.sku, p.short_description, p.description, p.materials,
                     p.technique, p.price_label, p.is_customizable, p.is_featured,
-                    p.whatsapp_enabled, p.telegram_enabled, p.share_enabled,
+                    p.whatsapp_enabled, p.telegram_enabled, p.share_enabled, p.category_id,
                     c.name AS category_name, c.slug AS category_slug
              FROM products p
              INNER JOIN categories c ON c.id = p.category_id

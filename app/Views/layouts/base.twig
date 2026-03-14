@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ pageTitle|default(app.name) }} | {{ app.name }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ pageDescription|default('Catalogo handmade e digital craft con prodotti personalizzati, richiesta diretta e laboratorio creativo.') }}{% endblock %}">
     <link rel="stylesheet" href="{{ app.url }}/assets/css/app.css">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     {% include 'components/header.twig' %}
     <main>
         {% block content %}{% endblock %}

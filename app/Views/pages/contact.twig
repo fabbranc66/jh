@@ -1,36 +1,53 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section>
+<section class="hero hero--compact">
+    <span class="eyebrow">Contatti</span>
     <h1>Contatti</h1>
-    <p>Scrivici per informazioni, personalizzazioni e richieste prodotto.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    <p>Usa il form per richieste prodotto, personalizzazioni, idee per eventi o lavorazioni speciali. Il contatto diretto e la base del progetto in questa fase.</p>
+    {% include 'components/flash.twig' %}
 </section>
 
-<section class="section-tight">
-    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/contatti">
-        {% include 'components/csrf.twig' %}
-        <div class="compact-grid compact-grid--2">
-            <label>
-                <span>Nome</span>
-                <input type="text" name="name" required>
-            </label>
-            <label>
-                <span>Email</span>
-                <input type="email" name="email">
-            </label>
-            <label>
-                <span>Telefono</span>
-                <input type="text" name="phone">
-            </label>
-        </div>
-        <label>
-            <span>Messaggio</span>
-            <textarea name="message" rows="6" required></textarea>
-        </label>
-        <button class="button button--small" type="submit">Invia richiesta</button>
-    </form>
+<section>
+    <div class="grid grid--2">
+        <article class="card">
+            <h2>Invia una richiesta</h2>
+            <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/contatti">
+                {% include 'components/csrf.twig' %}
+                <div class="compact-grid compact-grid--2">
+                    <label>
+                        <span>Nome</span>
+                        <input type="text" name="name" value="{{ old.name|default('') }}" required>
+                    </label>
+                    <label>
+                        <span>Email</span>
+                        <input type="email" name="email" value="{{ old.email|default('') }}">
+                    </label>
+                    <label>
+                        <span>Telefono</span>
+                        <input type="text" name="phone" value="{{ old.phone|default('') }}">
+                    </label>
+                </div>
+                <label>
+                    <span>Messaggio</span>
+                    <textarea name="message" rows="6" required>{{ old.message|default('') }}</textarea>
+                </label>
+                <button class="button button--small" type="submit">Invia richiesta</button>
+            </form>
+        </article>
+        <article class="card">
+            <h2>Quando usare questa pagina</h2>
+            <div class="stack-list">
+                <p>Richieste su prodotti gia pubblicati nel catalogo.</p>
+                <p>Personalizzazioni con nomi, colori, iniziali, temi e dettagli speciali.</p>
+                <p>Idee per eventi, bomboniere, regali o piccole produzioni su misura.</p>
+                <p>Domande generali sul laboratorio, tempi e fattibilita.</p>
+            </div>
+            <div class="hero__actions">
+                <a class="button button--ghost" href="{{ app.url }}/catalogo">Apri il catalogo</a>
+                <a class="button button--ghost" href="{{ app.url }}/laboratorio">Scopri il laboratorio</a>
+            </div>
+        </article>
+    </div>
 </section>
 {% endblock %}

@@ -19,10 +19,17 @@ final class HomeController
 
     public function index(): void
     {
+        $categories = $this->categories->listActive();
+        $featuredProducts = $this->products->latest(6);
+
         $this->view->render('pages/home.twig', [
             'pageTitle' => 'Laboratorio creativo handmade e digital craft',
-            'categories' => $this->categories->listActive(),
-            'featuredProducts' => $this->products->latest(6),
+            'categories' => $categories,
+            'featuredProducts' => $featuredProducts,
+            'stats' => [
+                'categories' => count($categories),
+                'products' => count($featuredProducts),
+            ],
         ]);
     }
 }

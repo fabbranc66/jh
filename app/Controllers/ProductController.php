@@ -36,6 +36,7 @@ final class ProductController
         $this->view->render('pages/product.twig', [
             'pageTitle' => $product['name'],
             'product' => $product,
+            'relatedProducts' => $this->products->relatedByCategory((int) $product['category_id'], (int) $product['id']),
         ]);
     }
 }

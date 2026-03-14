@@ -1,3 +1,14 @@
 <footer>
-    <p>&copy; {{ "now"|date("Y") }} {{ app.name }}</p>
+    <div class="site-footer">
+        <div>
+            <strong>{{ app.name }}</strong>
+            <p>Laboratorio creativo tra artigianato, resina, stampa 3D e personalizzazione su richiesta.</p>
+        </div>
+        <div class="site-footer__links">
+            <a href="{{ app.url }}/catalogo">Catalogo</a>
+            <a href="{{ app.url }}/laboratorio">Laboratorio</a>
+            <a href="{{ app.url }}/contatti">Contatti</a>
+        </div>
+        <p>&copy; {{ "now"|date("Y") }} {{ app.name }}</p>
+    </div>
 </footer>

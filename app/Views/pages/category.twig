@@ -1,15 +1,20 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section>
+<section class="hero hero--compact">
     <span class="eyebrow">Categoria</span>
     <h1>{{ category.name }}</h1>
     <p>{{ category.description ?: 'Linea di catalogo pronta per essere popolata con prodotti reali.' }}</p>
+    <div class="hero__actions">
+        <a class="button" href="{{ app.url }}/catalogo">Torna al catalogo</a>
+        <a class="button button--ghost" href="{{ app.url }}/contatti">Richiedi una personalizzazione</a>
+    </div>
 </section>
 
 <section>
     <div class="section-heading">
         <h2>Prodotti della categoria</h2>
+        <p>Se non trovi la variante giusta, puoi comunque inviare una richiesta diretta dal sito.</p>
     </div>
     <div class="grid grid--3">
         {% for product in products %}

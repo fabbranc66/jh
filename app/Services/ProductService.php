@@ -55,12 +55,12 @@ final class ProductService
 
     public function latest(int $limit = 12): array
     {
-        return $this->products->latestActive($limit);
+        return $this->hydratePublicProducts($this->products->latestActive($limit));
     }
 
     public function byCategory(int $categoryId, int $limit = 24): array
     {
-        return $this->products->latestActiveByCategory($categoryId, $limit);
+        return $this->hydratePublicProducts($this->products->latestActiveByCategory($categoryId, $limit));
     }
 
     public function findBySlug(string $slug): ?array
@@ -78,8 +78,23 @@ final class ProductService
             rtrim($_ENV['APP_URL'] ?? 'http://localhost/jh/public', '/'),
             $product['slug']
         ));
+        $product['telegram_share_url'] = sprintf(
+            'https://t.me/share/url?url=%s&text=%s',
+            rawurlencode(rtrim((string) ($_ENV['APP_URL'] ?? ''), '/') . '/prodotto/' . $product['slug']),
+            rawurlencode($product['name'])
+        );
 
         return $product;
+    }
+
+    public function relatedByCategory(int $categoryId, int $excludeId, int $limit = 3): array
+    {
+        $items = array_filter(
+            $this->byCategory($categoryId, $limit + 1),
+            static fn (array $product): bool => (int) $product['id'] !== $excludeId
+        );
+
+        return array_slice(array_values($items), 0, $limit);
     }
 
     public function findById(int $id): ?array
@@ -149,5 +164,17 @@ final class ProductService
         $value = trim($value, '-');
 
         return $value !== '' ? $value : 'prodotto';
+    }
+
+    private function hydratePublicProducts(array $products): array
+    {
+        return array_map(function (array $product): array {
+            $path = $product['primary_image_path'] ?? null;
+            $product['primary_image_url'] = $path
+                ? rtrim((string) ($_ENV['APP_URL'] ?? ''), '/') . '/' . ltrim($path, '/')
+                : null;
+
+            return $product;
+        }, $products);
     }
 }

@@ -21,6 +21,7 @@ final class ContactController
         $this->view->render('pages/contact.twig', [
             'pageTitle' => 'Contatti',
             'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
         ]);
     }
 
@@ -29,7 +30,9 @@ final class ContactController
         try {
             $this->contacts->create($_POST);
             $this->flash('success', 'Richiesta inviata correttamente.');
+            $this->clearOld();
         } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
             $this->flash('error', $exception->getMessage());
         }
 
@@ -52,5 +55,23 @@ final class ContactController
         unset($_SESSION['flash']);
 
         return is_array($flash) ? $flash : null;
+    }
+
+    private function rememberOld(array $input): void
+    {
+        $_SESSION['contact_old'] = $input;
+    }
+
+    private function pullOld(): array
+    {
+        $old = $_SESSION['contact_old'] ?? [];
+        unset($_SESSION['contact_old']);
+
+        return is_array($old) ? $old : [];
+    }
+
+    private function clearOld(): void
+    {
+        unset($_SESSION['contact_old']);
     }
 }

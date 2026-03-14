@@ -3,18 +3,32 @@
 {% block content %}
 <section class="hero">
     <span class="eyebrow">Artigianato contemporaneo tra manualita e tecnologia</span>
-    <h1>JH unisce handmade, resina, stampa 3D e personalizzazione in un catalogo pronto a crescere.</h1>
-    <p>Il sito nasce come vetrina prodotti con richiesta diretta via messaggio, ma con una struttura gia pensata per evolvere in e-commerce.</p>
+    <h1>Oggetti creativi personalizzati tra handmade, resina e stampa 3D.</h1>
+    <p>JH nasce come catalogo-vetrina per prodotti e lavorazioni su richiesta: gioielli, decorazioni, idee regalo, articoli per eventi e progetti personalizzati realizzati con un approccio artigianale e digitale.</p>
     <div class="hero__actions">
         <a class="button" href="{{ app.url }}/catalogo">Vai al catalogo</a>
-        <a class="button button--ghost" href="{{ app.url }}/laboratorio">Scopri il laboratorio</a>
+        <a class="button button--ghost" href="{{ app.url }}/contatti">Richiedi un prodotto</a>
+    </div>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <strong>{{ stats.categories }}</strong>
+            <span>categorie attive</span>
+        </div>
+        <div class="hero-stat">
+            <strong>richiesta diretta</strong>
+            <span>WhatsApp, Telegram o contatto</span>
+        </div>
+        <div class="hero-stat">
+            <strong>personalizzazioni</strong>
+            <span>nomi, colori, dettagli e varianti</span>
+        </div>
     </div>
 </section>
 
 <section>
     <div class="section-heading">
-        <h2>Categorie iniziali</h2>
-        <p>Una struttura ordinata per gestire il catalogo e capire quali linee funzionano meglio.</p>
+        <h2>Categorie del catalogo</h2>
+        <p>Il progetto e organizzato per linee chiare, cosi puoi esplorare il laboratorio per stile, tecnica o destinazione d'uso.</p>
     </div>
     <div class="grid grid--3">
         {% for category in categories %}
@@ -28,7 +42,7 @@
 <section>
     <div class="section-heading">
         <h2>Prodotti in evidenza</h2>
-        <p>La homepage e pronta a mostrare i prodotti pubblicati appena inizierai a caricarli.</p>
+        <p>Una selezione dei prodotti gia pubblicati, utile per capire subito materiali, stile e possibilita di personalizzazione.</p>
     </div>
     <div class="grid grid--3">
         {% for product in featuredProducts %}
@@ -36,6 +50,48 @@
         {% else %}
             <p>Non ci sono ancora prodotti pubblicati. Il catalogo e collegato al database e pronto a riceverli.</p>
         {% endfor %}
+    </div>
+</section>
+
+<section class="info-band">
+    <div>
+        <span class="eyebrow">Come funziona</span>
+        <h2>Prima si esplora, poi si richiede</h2>
+    </div>
+    <div class="grid grid--3">
+        <article class="card card--compact">
+            <h3>1. Scegli il prodotto</h3>
+            <p>Visita il catalogo, apri la scheda e guarda immagini, materiali e dettagli utili.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>2. Personalizza la richiesta</h3>
+            <p>Puoi chiedere varianti, colori, iniziali, nomi, temi evento o altre modifiche.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>3. Contatto diretto</h3>
+            <p>La richiesta parte senza checkout automatico, con un dialogo diretto piu adatto a lavori su misura.</p>
+        </article>
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Cosa rende diverso il progetto</h2>
+        <p>Non e solo un catalogo handmade: e una base per un laboratorio creativo scalabile, dove manualita e tecnologie digitali convivono.</p>
+    </div>
+    <div class="grid grid--3">
+        <article class="card card--compact">
+            <h3>Handmade</h3>
+            <p>Wire wrapping, resina artistica, dettagli fatti a mano e piccole serie curate.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Fabbricazione digitale</h3>
+            <p>Stampa 3D e sviluppo di oggetti personalizzati, decorativi o funzionali.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Evoluzione futura</h3>
+            <p>La struttura e gia pensata per crescere da vetrina a e-commerce, servizi 3D e aree piu evolute.</p>
+        </article>
     </div>
 </section>
 {% endblock %}

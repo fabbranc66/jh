@@ -1,7 +1,7 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section>
+<section class="product-hero">
     {% if product.images %}
         <div class="product-gallery">
             {% for image in product.images %}
@@ -11,44 +11,75 @@
             {% endfor %}
         </div>
     {% endif %}
-    <div class="card__meta">
-        <span class="pill">{{ product.category_name }}</span>
-        {% if product.is_customizable %}
-            <span class="pill pill--soft">Personalizzabile</span>
-        {% endif %}
-    </div>
-    <h1>{{ product.name }}</h1>
-    <p>{{ product.short_description ?: 'Prodotto artigianale su richiesta.' }}</p>
-    <div class="product-details">
-        <div>
-            <strong>Codice</strong>
-            <p>{{ product.sku ?: 'N/D' }}</p>
+    <div class="product-hero__content">
+        <div class="card__meta">
+            <span class="pill">{{ product.category_name }}</span>
+            {% if product.is_customizable %}
+                <span class="pill pill--soft">Personalizzabile</span>
+            {% endif %}
         </div>
-        <div>
-            <strong>Tecnica</strong>
-            <p>{{ product.technique ?: 'Da definire' }}</p>
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.short_description ?: 'Prodotto artigianale su richiesta.' }}</p>
+        <div class="product-details">
+            <div>
+                <strong>Codice</strong>
+                <p>{{ product.sku ?: 'N/D' }}</p>
+            </div>
+            <div>
+                <strong>Tecnica</strong>
+                <p>{{ product.technique ?: 'Da definire' }}</p>
+            </div>
+            <div>
+                <strong>Materiali</strong>
+                <p>{{ product.materials ?: 'Da definire' }}</p>
+            </div>
+            <div>
+                <strong>Prezzo</strong>
+                <p>{{ product.price_label ?: 'Su richiesta' }}</p>
+            </div>
         </div>
-        <div>
-            <strong>Materiali</strong>
-            <p>{{ product.materials ?: 'Da definire' }}</p>
-        </div>
-        <div>
-            <strong>Prezzo</strong>
-            <p>{{ product.price_label ?: 'Su richiesta' }}</p>
+        <div class="hero__actions">
+            {% if product.whatsapp_enabled %}
+                <a class="button" href="https://wa.me/?text={{ product.request_message }}" target="_blank" rel="noreferrer">Richiedi su WhatsApp</a>
+            {% endif %}
+            <a class="button button--ghost" href="{{ app.url }}/contatti">Invia richiesta dal sito</a>
         </div>
     </div>
 </section>
 
 <section>
-    <h2>Descrizione</h2>
-    <p>{{ product.description ?: 'La scheda prodotto e pronta a ricevere contenuti completi, immagini e personalizzazioni.' }}</p>
-    <div class="hero__actions">
-        {% if product.whatsapp_enabled %}
-            <a class="button" href="https://wa.me/?text={{ product.request_message }}" target="_blank" rel="noreferrer">Richiedi su WhatsApp</a>
-        {% endif %}
-        {% if product.telegram_enabled %}
-            <a class="button button--ghost" href="https://t.me/share/url?url={{ app.url }}/prodotto/{{ product.slug }}&text={{ product.name|url_encode }}" target="_blank" rel="noreferrer">Condividi su Telegram</a>
-        {% endif %}
+    <div class="section-heading">
+        <h2>Descrizione</h2>
+        <p>Ogni prodotto puo essere il punto di partenza per una versione personalizzata o una richiesta su misura.</p>
+    </div>
+    <div class="grid grid--2">
+        <article class="card card--compact">
+            <p>{{ product.description ?: 'La scheda prodotto e pronta a ricevere contenuti completi, immagini e personalizzazioni.' }}</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Richiesta e condivisione</h3>
+            <p>Puoi richiedere questo prodotto tramite contatto diretto e, se vuoi, condividerlo subito con chi deve partecipare alla scelta.</p>
+            <div class="hero__actions">
+                {% if product.telegram_enabled %}
+                    <a class="button button--ghost" href="{{ product.telegram_share_url }}" target="_blank" rel="noreferrer">Condividi su Telegram</a>
+                {% endif %}
+                <a class="button button--ghost" href="{{ app.url }}/categoria/{{ product.category_slug }}">Altri prodotti simili</a>
+            </div>
+        </article>
     </div>
 </section>
+
+{% if relatedProducts %}
+<section>
+    <div class="section-heading">
+        <h2>Altri prodotti correlati</h2>
+        <p>Alcune proposte della stessa linea, utili per confrontare stile, materiali e possibilita di personalizzazione.</p>
+    </div>
+    <div class="grid grid--3">
+        {% for relatedProduct in relatedProducts %}
+            {% include 'components/product-card.twig' with { product: relatedProduct } %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}
