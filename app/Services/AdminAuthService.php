@@ -6,22 +6,25 @@ namespace App\Services;
 
 final class AdminAuthService
 {
+    private const SESSION_KEY = 'admin_auth';
+
     public function isAuthenticated(): bool
     {
-        return !empty($_SESSION['admin_auth']);
+        return !empty($_SESSION[self::SESSION_KEY]);
     }
 
     public function username(): string
     {
-        return (string) ($_SESSION['admin_auth']['username'] ?? '');
+        return (string) ($_SESSION[self::SESSION_KEY]['username'] ?? '');
     }
 
     public function attempt(string $username, string $password): bool
     {
         $expectedUsername = (string) ($_ENV['ADMIN_USERNAME'] ?? 'admin');
+        $expectedPasswordHash = (string) ($_ENV['ADMIN_PASSWORD_HASH'] ?? '');
         $expectedPassword = (string) ($_ENV['ADMIN_PASSWORD'] ?? '');
 
-        if ($expectedPassword === '') {
+        if ($expectedPasswordHash === '' && $expectedPassword === '') {
             return false;
         }
 
@@ -29,11 +32,17 @@ final class AdminAuthService
             return false;
         }
 
-        if (!hash_equals($expectedPassword, $password)) {
+        $isValid = $expectedPasswordHash !== ''
+            ? password_verify($password, $expectedPasswordHash)
+            : hash_equals($expectedPassword, $password);
+
+        if (!$isValid) {
             return false;
         }
 
-        $_SESSION['admin_auth'] = [
+        session_regenerate_id(true);
+
+        $_SESSION[self::SESSION_KEY] = [
             'username' => $expectedUsername,
             'logged_in_at' => time(),
         ];
@@ -43,6 +52,7 @@ final class AdminAuthService
 
     public function logout(): void
     {
-        unset($_SESSION['admin_auth']);
+        unset($_SESSION[self::SESSION_KEY]);
+        session_regenerate_id(true);
     }
 }
