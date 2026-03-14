@@ -46,6 +46,15 @@ final class CategoryService
         $this->categories->update($id, $this->normalizeCategoryInput($input));
     }
 
+    public function delete(int $id): void
+    {
+        if ($this->categories->findById($id) === null) {
+            throw new \RuntimeException('Categoria non trovata.');
+        }
+
+        $this->categories->delete($id);
+    }
+
     private function normalizeCategoryInput(array $input): array
     {
         $name = trim((string) ($input['name'] ?? ''));

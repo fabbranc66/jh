@@ -31,6 +31,9 @@
         </label>
         <div class="hero__actions">
             <button class="button button--small" type="submit">Salva modifiche</button>
+            <form method="post" action="{{ app.url }}/admin/categorie/{{ category.id }}/elimina" onsubmit="return confirm('Eliminare questa categoria?');">
+                <button class="button button--ghost button--small" type="submit">Elimina categoria</button>
+            </form>
             <a class="button button--ghost button--small" href="{{ app.url }}/admin/categorie">Torna alle categorie</a>
         </div>
     </form>

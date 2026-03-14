@@ -33,8 +33,18 @@ final class ContactService
         ]);
     }
 
-    public function listAll(): array
+    public function listAll(array $filters = []): array
     {
-        return $this->requests->all();
+        return $this->requests->all($filters);
+    }
+
+    public function updateStatus(int $id, string $status): void
+    {
+        $allowed = ['new', 'in_progress', 'done', 'archived'];
+        if (!in_array($status, $allowed, true)) {
+            throw new RuntimeException('Stato richiesta non valido.');
+        }
+
+        $this->requests->updateStatus($id, $status);
     }
 }

@@ -92,13 +92,35 @@ final class AdminController
         $this->redirect('/admin/categorie/' . (int) $categoryId . '/modifica');
     }
 
+    public function deleteCategory(string $categoryId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->categories->delete((int) $categoryId);
+            $this->flash('success', 'Categoria eliminata.');
+            $this->redirect('/admin/categorie');
+        } catch (Throwable $exception) {
+            $this->flash('error', 'Impossibile eliminare la categoria. Verifica che non abbia prodotti collegati.');
+            $this->redirect('/admin/categorie/' . (int) $categoryId . '/modifica');
+        }
+    }
+
     public function products(): void
     {
         $this->requireAuth();
 
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+            'category_id' => (int) ($_GET['category_id'] ?? 0),
+        ];
+
         $this->view->render('pages/admin/products.twig', [
             'pageTitle' => 'Admin prodotti',
-            'products' => $this->products->listAllForAdmin(),
+            'products' => $this->products->listAllForAdmin($filters),
+            'categories' => $this->categories->listAll(),
+            'filters' => $filters,
             'flash' => $this->pullFlash(),
         ]);
     }
@@ -269,11 +291,31 @@ final class AdminController
     {
         $this->requireAuth();
 
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+        ];
+
         $this->view->render('pages/admin/contacts.twig', [
             'pageTitle' => 'Richieste contatto',
-            'requests' => $this->contacts->listAll(),
+            'requests' => $this->contacts->listAll($filters),
+            'filters' => $filters,
             'flash' => $this->pullFlash(),
         ]);
+    }
+
+    public function updateContactStatus(string $requestId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->contacts->updateStatus((int) $requestId, (string) ($_POST['status'] ?? ''));
+            $this->flash('success', 'Stato richiesta aggiornato.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/contatti');
     }
 
     private function flash(string $type, string $message): void

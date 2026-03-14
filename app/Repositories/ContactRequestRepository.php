@@ -32,16 +32,43 @@ final class ContactRequestRepository
         return (int) $this->pdo->lastInsertId();
     }
 
-    public function all(): array
+    public function all(array $filters = []): array
     {
-        $statement = $this->pdo->query(
-            'SELECT cr.id, cr.name, cr.email, cr.phone, cr.message, cr.source, cr.status, cr.created_at,
-                    p.name AS product_name
-             FROM contact_requests cr
-             LEFT JOIN products p ON p.id = cr.product_id
-             ORDER BY cr.id DESC'
-        );
+        $sql = 'SELECT cr.id, cr.name, cr.email, cr.phone, cr.message, cr.source, cr.status, cr.created_at,
+                       p.name AS product_name
+                FROM contact_requests cr
+                LEFT JOIN products p ON p.id = cr.product_id
+                WHERE 1=1';
+        $params = [];
+
+        if (($filters['q'] ?? '') !== '') {
+            $sql .= ' AND (cr.name LIKE :q OR cr.email LIKE :q OR cr.message LIKE :q)';
+            $params['q'] = '%' . $filters['q'] . '%';
+        }
+
+        if (($filters['status'] ?? '') !== '') {
+            $sql .= ' AND cr.status = :status';
+            $params['status'] = $filters['status'];
+        }
+
+        $sql .= ' ORDER BY cr.id DESC';
+
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute($params);
 
         return $statement->fetchAll();
+    }
+
+    public function updateStatus(int $id, string $status): void
+    {
+        $statement = $this->pdo->prepare(
+            'UPDATE contact_requests
+             SET status = :status
+             WHERE id = :id'
+        );
+        $statement->execute([
+            'id' => $id,
+            'status' => $status,
+        ]);
     }
 }

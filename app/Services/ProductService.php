@@ -16,7 +16,7 @@ final class ProductService
     ) {
     }
 
-    public function listAllForAdmin(): array
+    public function listAllForAdmin(array $filters = []): array
     {
         return array_map(function (array $product): array {
             $path = $product['primary_image_path'] ?? null;
@@ -29,7 +29,7 @@ final class ProductService
             }, $this->images->byProductId((int) $product['id']));
 
             return $product;
-        }, $this->products->allForAdmin());
+        }, $this->products->allForAdmin($filters));
     }
 
     public function latest(int $limit = 12): array

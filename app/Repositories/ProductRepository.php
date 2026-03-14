@@ -12,22 +12,41 @@ final class ProductRepository
     {
     }
 
-    public function allForAdmin(): array
+    public function allForAdmin(array $filters = []): array
     {
-        $statement = $this->pdo->query(
-            'SELECT p.id, p.name, p.slug, p.sku, p.price_label, p.status, p.is_featured, p.is_customizable,
-                    c.name AS category_name,
-                    (
-                        SELECT pi.image_path
-                        FROM product_images pi
-                        WHERE pi.product_id = p.id
-                        ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.id ASC
-                        LIMIT 1
-                    ) AS primary_image_path
-             FROM products p
-             INNER JOIN categories c ON c.id = p.category_id
-             ORDER BY p.id DESC'
-        );
+        $sql = 'SELECT p.id, p.name, p.slug, p.sku, p.price_label, p.status, p.is_featured, p.is_customizable,
+                       c.name AS category_name, c.id AS category_id,
+                       (
+                           SELECT pi.image_path
+                           FROM product_images pi
+                           WHERE pi.product_id = p.id
+                           ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.id ASC
+                           LIMIT 1
+                       ) AS primary_image_path
+                FROM products p
+                INNER JOIN categories c ON c.id = p.category_id
+                WHERE 1=1';
+        $params = [];
+
+        if (($filters['q'] ?? '') !== '') {
+            $sql .= ' AND (p.name LIKE :q OR p.sku LIKE :q OR p.slug LIKE :q)';
+            $params['q'] = '%' . $filters['q'] . '%';
+        }
+
+        if (($filters['status'] ?? '') !== '') {
+            $sql .= ' AND p.status = :status';
+            $params['status'] = $filters['status'];
+        }
+
+        if ((int) ($filters['category_id'] ?? 0) > 0) {
+            $sql .= ' AND p.category_id = :category_id';
+            $params['category_id'] = (int) $filters['category_id'];
+        }
+
+        $sql .= ' ORDER BY p.id DESC';
+
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute($params);
 
         return $statement->fetchAll();
     }

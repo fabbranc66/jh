@@ -49,6 +49,7 @@ $flight->route('GET /admin/categorie', [$adminController, 'categories']);
 $flight->route('GET /admin/categorie/@categoryId/modifica', [$adminController, 'editCategory']);
 $flight->route('POST /admin/categorie', [$adminController, 'storeCategory']);
 $flight->route('POST /admin/categorie/@categoryId/modifica', [$adminController, 'updateCategory']);
+$flight->route('POST /admin/categorie/@categoryId/elimina', [$adminController, 'deleteCategory']);
 $flight->route('GET /admin/prodotti', [$adminController, 'products']);
 $flight->route('GET /admin/prodotti/nuovo', [$adminController, 'newProduct']);
 $flight->route('POST /admin/prodotti', [$adminController, 'storeProduct']);
@@ -60,5 +61,6 @@ $flight->route('POST /admin/prodotti/@productId/immagini/esistenti', [$adminCont
 $flight->route('POST /admin/immagini/@imageId/principale', [$adminController, 'makePrimaryProductImage']);
 $flight->route('POST /admin/immagini/@imageId/rimuovi', [$adminController, 'removeProductImage']);
 $flight->route('GET /admin/contatti', [$adminController, 'contacts']);
+$flight->route('POST /admin/contatti/@requestId/stato', [$adminController, 'updateContactStatus']);
 $flight->route('GET /contatti', [$contactController, 'index']);
 $flight->route('POST /contatti', [$contactController, 'submit']);

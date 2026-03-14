@@ -11,6 +11,31 @@
 </section>
 
 <section>
+    <form class="admin-form admin-form--compact" method="get" action="{{ app.url }}/admin/contatti">
+        <div class="compact-grid compact-grid--2 compact-grid--align-end">
+            <label>
+                <span>Cerca</span>
+                <input type="text" name="q" value="{{ filters.q }}">
+            </label>
+            <label>
+                <span>Stato</span>
+                <select name="status">
+                    <option value="">Tutti</option>
+                    <option value="new" {{ filters.status == 'new' ? 'selected' : '' }}>Nuovo</option>
+                    <option value="in_progress" {{ filters.status == 'in_progress' ? 'selected' : '' }}>In lavorazione</option>
+                    <option value="done" {{ filters.status == 'done' ? 'selected' : '' }}>Completato</option>
+                    <option value="archived" {{ filters.status == 'archived' ? 'selected' : '' }}>Archiviato</option>
+                </select>
+            </label>
+        </div>
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Filtra</button>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/contatti">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section>
     <div class="table-wrap">
         <table class="admin-table">
             <thead>
@@ -22,6 +47,7 @@
                     <th>Messaggio</th>
                     <th>Prodotto</th>
                     <th>Stato</th>
+                    <th>Azione</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,10 +60,21 @@
                         <td>{{ request.message }}</td>
                         <td>{{ request.product_name ?: 'Generico' }}</td>
                         <td>{{ request.status }}</td>
+                        <td>
+                            <form class="inline-status" method="post" action="{{ app.url }}/admin/contatti/{{ request.id }}/stato">
+                                <select name="status">
+                                    <option value="new" {{ request.status == 'new' ? 'selected' : '' }}>Nuovo</option>
+                                    <option value="in_progress" {{ request.status == 'in_progress' ? 'selected' : '' }}>In lavorazione</option>
+                                    <option value="done" {{ request.status == 'done' ? 'selected' : '' }}>Completato</option>
+                                    <option value="archived" {{ request.status == 'archived' ? 'selected' : '' }}>Archiviato</option>
+                                </select>
+                                <button class="button button--ghost button--tiny" type="submit">Salva</button>
+                            </form>
+                        </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7">Nessuna richiesta contatto presente.</td>
+                        <td colspan="8">Nessuna richiesta contatto presente.</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -106,4 +106,14 @@ final class CategoryRepository
             'is_active' => $data['is_active'],
         ]);
     }
+
+    public function delete(int $id): void
+    {
+        $statement = $this->pdo->prepare(
+            'DELETE FROM categories
+             WHERE id = :id'
+        );
+
+        $statement->execute(['id' => $id]);
+    }
 }
