@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\View;
+use App\Services\ProductImageService;
 use App\Services\ProductService;
 
 final class ProductController
 {
     public function __construct(
         private View $view,
-        private ProductService $products
+        private ProductService $products,
+        private ProductImageService $images
     ) {
     }
 
@@ -28,6 +30,8 @@ final class ProductController
             ]);
             return;
         }
+
+        $product['images'] = $this->images->byProductId((int) $product['id']);
 
         $this->view->render('pages/product.twig', [
             'pageTitle' => $product['name'],

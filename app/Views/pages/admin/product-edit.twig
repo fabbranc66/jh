@@ -1,0 +1,158 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Admin prodotti</span>
+    <h1>Modifica prodotto</h1>
+    <p class="section-note">Aggiorna i dati dell'articolo senza reinserirlo da zero.</p>
+    {% if flash %}
+        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/modifica">
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Categoria</span>
+                <select name="category_id" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {{ category.id == product.category_id ? 'selected' : '' }}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Nome prodotto</span>
+                <input type="text" name="name" value="{{ product.name }}" required>
+            </label>
+            <label>
+                <span>SKU</span>
+                <input type="text" name="sku" value="{{ product.sku }}">
+            </label>
+            <label>
+                <span>Tecnica</span>
+                <input type="text" name="technique" value="{{ product.technique }}">
+            </label>
+            <label>
+                <span>Etichetta prezzo</span>
+                <input type="text" name="price_label" value="{{ product.price_label }}">
+            </label>
+            <label>
+                <span>Stato</span>
+                <select name="status">
+                    <option value="draft" {{ product.status == 'draft' ? 'selected' : '' }}>Bozza</option>
+                    <option value="published" {{ product.status == 'published' ? 'selected' : '' }}>Pubblicato</option>
+                </select>
+            </label>
+        </div>
+        <label>
+            <span>Descrizione breve</span>
+            <input type="text" name="short_description" value="{{ product.short_description }}">
+        </label>
+        <div class="compact-grid compact-grid--2">
+            <label>
+                <span>Materiali</span>
+                <input type="text" name="materials" value="{{ product.materials }}">
+            </label>
+            <div class="checkbox-grid">
+                <label class="checkbox"><input type="checkbox" name="is_customizable" {{ product.is_customizable ? 'checked' : '' }}><span>Personalizzabile</span></label>
+                <label class="checkbox"><input type="checkbox" name="is_featured" {{ product.is_featured ? 'checked' : '' }}><span>In evidenza</span></label>
+                <label class="checkbox"><input type="checkbox" name="whatsapp_enabled" {{ product.whatsapp_enabled ? 'checked' : '' }}><span>WhatsApp</span></label>
+                <label class="checkbox"><input type="checkbox" name="telegram_enabled" {{ product.telegram_enabled ? 'checked' : '' }}><span>Telegram</span></label>
+                <label class="checkbox"><input type="checkbox" name="share_enabled" {{ product.share_enabled ? 'checked' : '' }}><span>Condivisione</span></label>
+            </div>
+        </div>
+        <div class="checkbox-grid">
+            <label>
+                <span>Descrizione completa</span>
+                <textarea name="description" rows="5">{{ product.description }}</textarea>
+            </label>
+        </div>
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Salva modifiche</button>
+            <form method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/elimina" onsubmit="return confirm('Eliminare questo prodotto?');">
+                <button class="button button--ghost button--small" type="submit">Elimina prodotto</button>
+            </form>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/prodotti">Torna ai prodotti</a>
+        </div>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Immagini prodotto</h2>
+    <p class="section-note">Gestisci immagini, principale e rimozione direttamente dentro la scheda di modifica.</p>
+    {% if images %}
+        <div class="admin-thumb-list admin-thumb-list--edit admin-thumb-list--compact">
+            {% for image in images %}
+                <div class="admin-image-item admin-image-item--edit">
+                    <img class="admin-thumb admin-thumb--edit {{ image.is_primary ? 'is-primary' : '' }}" src="{{ image.public_url }}" alt="{{ image.alt_text ?: product.name }}">
+                    <div class="admin-image-actions">
+                        {% if not image.is_primary %}
+                            <form method="post" action="{{ app.url }}/admin/immagini/{{ image.id }}/principale">
+                                <button class="button button--ghost button--tiny" type="submit">Principale</button>
+                            </form>
+                        {% else %}
+                            <span class="pill pill--tiny">Principale</span>
+                        {% endif %}
+                        <form method="post" action="{{ app.url }}/admin/immagini/{{ image.id }}/rimuovi">
+                            <button class="button button--ghost button--tiny" type="submit">Rimuovi</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Nessuna immagine associata al prodotto.</p>
+    {% endif %}
+</section>
+
+<section class="section-tight">
+    <h2>Carica nuova immagine</h2>
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/immagini" enctype="multipart/form-data">
+        <div class="compact-grid compact-grid--2 compact-grid--align-end">
+            <label>
+                <span>File immagine</span>
+                <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+            </label>
+            <label>
+                <span>Testo alternativo</span>
+                <input type="text" name="alt_text" value="{{ product.name }}">
+            </label>
+        </div>
+        <button class="button button--small" type="submit">Carica immagine</button>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Associa immagine esistente</h2>
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/immagini/esistenti">
+        <div>
+            <span class="admin-field-label">Libreria locale</span>
+            {% if imageLibrary %}
+                <div class="library-grid">
+                    {% for image in imageLibrary %}
+                        <label class="library-card">
+                            <input class="library-card__input" type="radio" name="image_path" value="{{ image.image_path }}" required>
+                            <span class="library-card__frame">
+                                <img src="{{ image.public_url }}" alt="{{ image.file_name }}">
+                                <span class="library-card__name">{{ image.file_name }}</span>
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Nessuna immagine disponibile nella libreria locale.</p>
+            {% endif %}
+        </div>
+        <div class="compact-grid compact-grid--2 compact-grid--align-end">
+            <label>
+                <span>Testo alternativo</span>
+                <input type="text" name="alt_text" value="{{ product.name }}">
+            </label>
+            <div class="compact-actions">
+                <button class="button button--ghost button--small" type="submit">Associa immagine</button>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

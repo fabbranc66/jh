@@ -1,0 +1,38 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Admin categorie</span>
+    <h1>Modifica categoria</h1>
+    {% if flash %}
+        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/categorie/{{ category.id }}/modifica">
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Nome</span>
+                <input type="text" name="name" value="{{ category.name }}" required>
+            </label>
+            <label>
+                <span>Ordine</span>
+                <input type="number" name="sort_order" value="{{ category.sort_order }}">
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" name="is_active" {{ category.is_active ? 'checked' : '' }}>
+                <span>Attiva</span>
+            </label>
+        </div>
+        <label>
+            <span>Descrizione</span>
+            <textarea name="description" rows="5">{{ category.description }}</textarea>
+        </label>
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Salva modifiche</button>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/categorie">Torna alle categorie</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

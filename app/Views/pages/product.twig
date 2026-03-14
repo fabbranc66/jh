@@ -2,6 +2,15 @@
 
 {% block content %}
 <section>
+    {% if product.images %}
+        <div class="product-gallery">
+            {% for image in product.images %}
+                <figure class="product-gallery__item {{ image.is_primary ? 'is-primary' : '' }}">
+                    <img src="{{ image.public_url }}" alt="{{ image.alt_text ?: product.name }}">
+                </figure>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div class="card__meta">
         <span class="pill">{{ product.category_name }}</span>
         {% if product.is_customizable %}

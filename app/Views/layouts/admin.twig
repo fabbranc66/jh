@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pageTitle|default('Admin') }} | {{ app.name }}</title>
+    <link rel="stylesheet" href="{{ app.url }}/assets/css/app.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="admin-header__inner">
+            <a class="admin-brand" href="{{ admin.authenticated ? app.url ~ '/admin' : app.url ~ '/admin/login' }}">JH Admin</a>
+            {% if admin.authenticated %}
+                <nav class="admin-nav">
+                    <a href="{{ app.url }}/admin">Dashboard</a>
+                    <a href="{{ app.url }}/admin/categorie">Categorie</a>
+                    <a href="{{ app.url }}/admin/prodotti">Prodotti</a>
+                    <a href="{{ app.url }}/admin/contatti">Contatti</a>
+                    <a href="{{ app.url }}/">Sito</a>
+                    <form method="post" action="{{ app.url }}/admin/logout">
+                        <button class="button button--ghost button--small" type="submit">Logout {{ admin.username }}</button>
+                    </form>
+                </nav>
+            {% endif %}
+        </div>
+    </header>
+    <main class="admin-main">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

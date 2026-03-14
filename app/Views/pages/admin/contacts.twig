@@ -1,0 +1,47 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Admin contatti</span>
+    <h1>Richieste contatto</h1>
+    <p class="section-note">Messaggi inviati dal form pubblico del sito.</p>
+    {% if flash %}
+        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+</section>
+
+<section>
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Messaggio</th>
+                    <th>Prodotto</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td>{{ request.name }}</td>
+                        <td>{{ request.email ?: 'N/D' }}</td>
+                        <td>{{ request.phone ?: 'N/D' }}</td>
+                        <td>{{ request.message }}</td>
+                        <td>{{ request.product_name ?: 'Generico' }}</td>
+                        <td>{{ request.status }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">Nessuna richiesta contatto presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

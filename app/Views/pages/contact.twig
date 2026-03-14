@@ -3,6 +3,33 @@
 {% block content %}
 <section>
     <h1>Contatti</h1>
-    <p>Pagina contatti iniziale con spazio per form e canali diretti.</p>
+    <p>Scrivici per informazioni, personalizzazioni e richieste prodotto.</p>
+    {% if flash %}
+        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/contatti">
+        <div class="compact-grid compact-grid--2">
+            <label>
+                <span>Nome</span>
+                <input type="text" name="name" required>
+            </label>
+            <label>
+                <span>Email</span>
+                <input type="email" name="email">
+            </label>
+            <label>
+                <span>Telefono</span>
+                <input type="text" name="phone">
+            </label>
+        </div>
+        <label>
+            <span>Messaggio</span>
+            <textarea name="message" rows="6" required></textarea>
+        </label>
+        <button class="button button--small" type="submit">Invia richiesta</button>
+    </form>
 </section>
 {% endblock %}

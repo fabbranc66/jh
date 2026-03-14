@@ -1,0 +1,23 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section class="login-shell">
+    <span class="eyebrow">Area riservata</span>
+    <h1>Login admin</h1>
+    <p>Accesso leggero basato su credenziali definite nel file `.env`.</p>
+    {% if flash %}
+        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+    <form class="admin-form" method="post" action="{{ app.url }}/admin/login">
+        <label>
+            <span>Username</span>
+            <input type="text" name="username" required>
+        </label>
+        <label>
+            <span>Password</span>
+            <input type="password" name="password" required>
+        </label>
+        <button class="button" type="submit">Entra</button>
+    </form>
+</section>
+{% endblock %}

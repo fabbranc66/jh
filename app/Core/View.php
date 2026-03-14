@@ -28,4 +28,9 @@ final class View
     {
         echo $this->twig->render($template, $data);
     }
+
+    public function addGlobal(string $name, mixed $value): void
+    {
+        $this->twig->addGlobal($name, $value);
+    }
 }

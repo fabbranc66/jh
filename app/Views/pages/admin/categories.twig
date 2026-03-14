@@ -1,0 +1,67 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Admin categorie</span>
+    <h1>Categorie</h1>
+    <p>Inserisci nuove linee del catalogo e tieni ordinata la struttura del sito.</p>
+    {% if flash %}
+        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
+    {% endif %}
+</section>
+
+<section>
+    <h2>Nuova categoria</h2>
+    <form class="admin-form" method="post" action="{{ app.url }}/admin/categorie">
+        <label>
+            <span>Nome</span>
+            <input type="text" name="name" required>
+        </label>
+        <label>
+            <span>Descrizione</span>
+            <textarea name="description" rows="4"></textarea>
+        </label>
+        <label>
+            <span>Ordine</span>
+            <input type="number" name="sort_order" value="0">
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" name="is_active" checked>
+            <span>Attiva subito</span>
+        </label>
+        <button class="button" type="submit">Salva categoria</button>
+    </form>
+</section>
+
+<section>
+    <h2>Elenco categorie</h2>
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Slug</th>
+                    <th>Ordine</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td><a class="pill pill--link" href="{{ app.url }}/admin/categorie/{{ category.id }}/modifica">{{ category.name }}</a></td>
+                        <td>{{ category.slug }}</td>
+                        <td>{{ category.sort_order }}</td>
+                        <td>{{ category.is_active ? 'Attiva' : 'Bozza' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">Nessuna categoria presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
