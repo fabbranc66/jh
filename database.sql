@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS `contact_requests` (
   `name` VARCHAR(150) NOT NULL,
   `email` VARCHAR(180) NULL,
   `phone` VARCHAR(50) NULL,
+  `ip_address` VARCHAR(45) NULL,
   `message` TEXT NOT NULL,
   `product_id` INT UNSIGNED NULL,
   `source` VARCHAR(50) NOT NULL DEFAULT 'website',

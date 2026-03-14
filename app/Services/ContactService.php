@@ -13,7 +13,7 @@ final class ContactService
     {
     }
 
-    public function create(array $input): int
+    public function create(array $input, array $server = []): int
     {
         $name = trim((string) ($input['name'] ?? ''));
         $message = trim((string) ($input['message'] ?? ''));
@@ -26,6 +26,7 @@ final class ContactService
             'name' => $name,
             'email' => trim((string) ($input['email'] ?? '')),
             'phone' => trim((string) ($input['phone'] ?? '')),
+            'ip_address' => $this->detectIpAddress($server),
             'message' => $message,
             'product_id' => null,
             'source' => 'website',
@@ -62,5 +63,28 @@ final class ContactService
         }
 
         $this->requests->updateStatus($id, $status);
+    }
+
+    private function detectIpAddress(array $server): ?string
+    {
+        $candidates = [];
+
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'] as $key) {
+            $value = trim((string) ($server[$key] ?? ''));
+            if ($value !== '') {
+                $candidates[] = $value;
+            }
+        }
+
+        foreach ($candidates as $candidate) {
+            $parts = array_map('trim', explode(',', $candidate));
+            foreach ($parts as $ip) {
+                if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
+                    return $ip;
+                }
+            }
+        }
+
+        return null;
     }
 }

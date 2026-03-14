@@ -42,6 +42,7 @@
                     <th>Nome</th>
                     <th>Email</th>
                     <th>Telefono</th>
+                    <th>IP</th>
                     <th>Messaggio</th>
                     <th>Prodotto</th>
                     <th>Stato</th>
@@ -55,6 +56,7 @@
                         <td>{{ request.name }}</td>
                         <td>{{ request.email ?: 'N/D' }}</td>
                         <td>{{ request.phone ?: 'N/D' }}</td>
+                        <td><code>{{ request.ip_address ?: 'N/D' }}</code></td>
                         <td>{{ request.message }}</td>
                         <td>{{ request.product_name ?: 'Generico' }}</td>
                         <td>{{ request.status }}</td>
@@ -73,7 +75,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="8">Nessuna richiesta contatto presente.</td>
+                        <td colspan="9">Nessuna richiesta contatto presente.</td>
                     </tr>
                 {% endfor %}
             </tbody>

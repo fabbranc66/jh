@@ -24,6 +24,24 @@ if (is_file(BASE_PATH . '/.env')) {
 $appConfig = require BASE_PATH . '/config/app.php';
 $dbConfig = require BASE_PATH . '/config/database.php';
 
+if (PHP_SAPI !== 'cli') {
+    $forwardedProto = trim(explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))[0] ?? '');
+    $isHttps = $forwardedProto !== ''
+        ? $forwardedProto === 'https'
+        : (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = trim((string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+    $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+    $basePath = preg_replace('#/index\.php$#', '', $scriptName) ?? '';
+    $basePath = rtrim($basePath, '/');
+
+    if ($host !== '') {
+        $runtimeUrl = $scheme . '://' . $host . ($basePath !== '' ? $basePath : '');
+        $appConfig['url'] = rtrim($runtimeUrl, '/');
+        $_ENV['APP_URL'] = $appConfig['url'];
+    }
+}
+
 date_default_timezone_set($appConfig['timezone']);
 
 ini_set('display_errors', $appConfig['debug'] ? '1' : '0');

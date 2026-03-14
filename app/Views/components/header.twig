@@ -1,10 +1,15 @@
 <header>
     <div class="site-header">
-        <a class="site-brand" href="{{ app.url }}/">
-            <span class="site-brand__mark">JH</span>
-            <span class="site-brand__text">Handmade & Digital Craft</span>
+        <a class="site-brand site-brand--solo" href="{{ app.url }}/" aria-label="JH Home">
+            <img class="site-brand__logo" src="{{ app.url }}/assets/images/jh-logo-3d.svg?v={{ app.asset_version }}" alt="JH logo">
         </a>
-        <nav class="site-nav">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span class="nav-toggle__label">Menu</span>
+        </button>
+        <nav class="site-nav" id="site-nav" data-site-nav>
             <a href="{{ app.url }}/">Home</a>
             <a href="{{ app.url }}/catalogo">Catalogo</a>
             <a href="{{ app.url }}/laboratorio">Laboratorio</a>

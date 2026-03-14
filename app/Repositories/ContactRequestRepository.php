@@ -15,14 +15,15 @@ final class ContactRequestRepository
     public function create(array $data): int
     {
         $statement = $this->pdo->prepare(
-            'INSERT INTO contact_requests (name, email, phone, message, product_id, source, status)
-             VALUES (:name, :email, :phone, :message, :product_id, :source, :status)'
+            'INSERT INTO contact_requests (name, email, phone, ip_address, message, product_id, source, status)
+             VALUES (:name, :email, :phone, :ip_address, :message, :product_id, :source, :status)'
         );
 
         $statement->execute([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
+            'ip_address' => $data['ip_address'],
             'message' => $data['message'],
             'product_id' => $data['product_id'],
             'source' => $data['source'],
@@ -49,7 +50,7 @@ final class ContactRequestRepository
 
     public function paginated(array $filters = [], int $limit = 20, int $offset = 0): array
     {
-        $sql = 'SELECT cr.id, cr.name, cr.email, cr.phone, cr.message, cr.source, cr.status, cr.created_at,
+        $sql = 'SELECT cr.id, cr.name, cr.email, cr.phone, cr.ip_address, cr.message, cr.source, cr.status, cr.created_at,
                        p.name AS product_name
                 FROM contact_requests cr
                 LEFT JOIN products p ON p.id = cr.product_id ';
@@ -86,7 +87,7 @@ final class ContactRequestRepository
         $params = [];
 
         if (($filters['q'] ?? '') !== '') {
-            $where[] = '(cr.name LIKE :q OR cr.email LIKE :q OR cr.message LIKE :q)';
+            $where[] = '(cr.name LIKE :q OR cr.email LIKE :q OR cr.ip_address LIKE :q OR cr.message LIKE :q)';
             $params['q'] = '%' . $filters['q'] . '%';
         }
 

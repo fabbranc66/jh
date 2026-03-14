@@ -28,7 +28,7 @@ final class ContactController
     public function submit(): void
     {
         try {
-            $this->contacts->create($_POST);
+            $this->contacts->create($_POST, $_SERVER);
             $this->flash('success', 'Richiesta inviata correttamente.');
             $this->clearOld();
         } catch (Throwable $exception) {
