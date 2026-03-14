@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ pageTitle|default(app.name) }} | {{ app.name }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ app.url }}/assets/css/app.css">
+</head>
+<body>
+    {% include 'components/header.twig' %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'components/footer.twig' %}
+    <script src="{{ app.url }}/assets/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">404</span>
+    <h1>{{ pageTitle }}</h1>
+    <p>{{ message }}</p>
+    <div class="hero__actions">
+        <a class="button" href="{{ app.url }}/">Torna alla home</a>
+        <a class="button button--ghost" href="{{ app.url }}/catalogo">Vai al catalogo</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+<article class="card">
+    <div class="card__meta">
+        <span class="pill">{{ product.category_name }}</span>
+        {% if product.is_customizable %}
+            <span class="pill pill--soft">Personalizzabile</span>
+        {% endif %}
+    </div>
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.short_description ?: 'Prodotto artigianale e digitale su richiesta.' }}</p>
+    <div class="card__footer">
+        <span>{{ product.price_label ?: 'Prezzo su richiesta' }}</span>
+        <a href="{{ app.url }}/prodotto/{{ product.slug }}">Apri scheda</a>
+    </div>
+</article>

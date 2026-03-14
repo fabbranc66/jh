@@ -1,0 +1,41 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">Artigianato contemporaneo tra manualita e tecnologia</span>
+    <h1>JH unisce handmade, resina, stampa 3D e personalizzazione in un catalogo pronto a crescere.</h1>
+    <p>Il sito nasce come vetrina prodotti con richiesta diretta via messaggio, ma con una struttura gia pensata per evolvere in e-commerce.</p>
+    <div class="hero__actions">
+        <a class="button" href="{{ app.url }}/catalogo">Vai al catalogo</a>
+        <a class="button button--ghost" href="{{ app.url }}/laboratorio">Scopri il laboratorio</a>
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Categorie iniziali</h2>
+        <p>Una struttura ordinata per gestire il catalogo e capire quali linee funzionano meglio.</p>
+    </div>
+    <div class="grid grid--3">
+        {% for category in categories %}
+            {% include 'components/category-card.twig' with { category: category } %}
+        {% else %}
+            <p>Nessuna categoria disponibile al momento.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Prodotti in evidenza</h2>
+        <p>La homepage e pronta a mostrare i prodotti pubblicati appena inizierai a caricarli.</p>
+    </div>
+    <div class="grid grid--3">
+        {% for product in featuredProducts %}
+            {% include 'components/product-card.twig' with { product: product } %}
+        {% else %}
+            <p>Non ci sono ancora prodotti pubblicati. Il catalogo e collegato al database e pronto a riceverli.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

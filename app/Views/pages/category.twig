@@ -1,0 +1,22 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Categoria</span>
+    <h1>{{ category.name }}</h1>
+    <p>{{ category.description ?: 'Linea di catalogo pronta per essere popolata con prodotti reali.' }}</p>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Prodotti della categoria</h2>
+    </div>
+    <div class="grid grid--3">
+        {% for product in products %}
+            {% include 'components/product-card.twig' with { product: product } %}
+        {% else %}
+            <p>Questa categoria non contiene ancora prodotti pubblicati.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
