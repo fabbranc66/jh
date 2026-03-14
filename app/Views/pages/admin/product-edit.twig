@@ -12,6 +12,7 @@
 
 <section class="section-tight">
     <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/modifica">
+        {% include 'components/csrf.twig' %}
         <div class="compact-grid compact-grid--3">
             <label>
                 <span>Categoria</span>
@@ -71,6 +72,7 @@
         <div class="hero__actions">
             <button class="button button--small" type="submit">Salva modifiche</button>
             <form method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/elimina" onsubmit="return confirm('Eliminare questo prodotto?');">
+                {% include 'components/csrf.twig' %}
                 <button class="button button--ghost button--small" type="submit">Elimina prodotto</button>
             </form>
             <a class="button button--ghost button--small" href="{{ app.url }}/admin/prodotti">Torna ai prodotti</a>
@@ -89,12 +91,14 @@
                     <div class="admin-image-actions">
                         {% if not image.is_primary %}
                             <form method="post" action="{{ app.url }}/admin/immagini/{{ image.id }}/principale">
+                                {% include 'components/csrf.twig' %}
                                 <button class="button button--ghost button--tiny" type="submit">Principale</button>
                             </form>
                         {% else %}
                             <span class="pill pill--tiny">Principale</span>
                         {% endif %}
                         <form method="post" action="{{ app.url }}/admin/immagini/{{ image.id }}/rimuovi">
+                            {% include 'components/csrf.twig' %}
                             <button class="button button--ghost button--tiny" type="submit">Rimuovi</button>
                         </form>
                     </div>
@@ -109,6 +113,7 @@
 <section class="section-tight">
     <h2>Carica nuova immagine</h2>
     <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/immagini" enctype="multipart/form-data">
+        {% include 'components/csrf.twig' %}
         <div class="compact-grid compact-grid--2 compact-grid--align-end">
             <label>
                 <span>File immagine</span>
@@ -126,6 +131,7 @@
 <section class="section-tight">
     <h2>Associa immagine esistente</h2>
     <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/immagini/esistenti">
+        {% include 'components/csrf.twig' %}
         <div>
             <span class="admin-field-label">Libreria locale</span>
             {% if imageLibrary %}

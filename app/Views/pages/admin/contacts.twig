@@ -62,6 +62,7 @@
                         <td>{{ request.status }}</td>
                         <td>
                             <form class="inline-status" method="post" action="{{ app.url }}/admin/contatti/{{ request.id }}/stato">
+                                {% include 'components/csrf.twig' %}
                                 <select name="status">
                                     <option value="new" {{ request.status == 'new' ? 'selected' : '' }}>Nuovo</option>
                                     <option value="in_progress" {{ request.status == 'in_progress' ? 'selected' : '' }}>In lavorazione</option>

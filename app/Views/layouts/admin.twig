@@ -18,6 +18,7 @@
                     <a href="{{ app.url }}/admin/contatti">Contatti</a>
                     <a href="{{ app.url }}/">Sito</a>
                     <form method="post" action="{{ app.url }}/admin/logout">
+                        {% include 'components/csrf.twig' %}
                         <button class="button button--ghost button--small" type="submit">Logout {{ admin.username }}</button>
                     </form>
                 </nav>

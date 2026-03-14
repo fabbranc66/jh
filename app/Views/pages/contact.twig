@@ -11,6 +11,7 @@
 
 <section class="section-tight">
     <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/contatti">
+        {% include 'components/csrf.twig' %}
         <div class="compact-grid compact-grid--2">
             <label>
                 <span>Nome</span>

@@ -12,6 +12,7 @@
 
 <section>
     <form class="admin-form" method="post" action="{{ app.url }}/admin/prodotti">
+        {% include 'components/csrf.twig' %}
         <label>
             <span>Categoria</span>
             <select name="category_id" required>

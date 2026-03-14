@@ -11,6 +11,7 @@
 
 <section class="section-tight">
     <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/categorie/{{ category.id }}/modifica">
+        {% include 'components/csrf.twig' %}
         <div class="compact-grid compact-grid--3">
             <label>
                 <span>Nome</span>
@@ -32,6 +33,7 @@
         <div class="hero__actions">
             <button class="button button--small" type="submit">Salva modifiche</button>
             <form method="post" action="{{ app.url }}/admin/categorie/{{ category.id }}/elimina" onsubmit="return confirm('Eliminare questa categoria?');">
+                {% include 'components/csrf.twig' %}
                 <button class="button button--ghost button--small" type="submit">Elimina categoria</button>
             </form>
             <a class="button button--ghost button--small" href="{{ app.url }}/admin/categorie">Torna alle categorie</a>

@@ -13,6 +13,7 @@
 <section>
     <h2>Nuova categoria</h2>
     <form class="admin-form" method="post" action="{{ app.url }}/admin/categorie">
+        {% include 'components/csrf.twig' %}
         <label>
             <span>Nome</span>
             <input type="text" name="name" required>
