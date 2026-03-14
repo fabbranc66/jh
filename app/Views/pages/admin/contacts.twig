@@ -5,9 +5,7 @@
     <span class="eyebrow">Admin contatti</span>
     <h1>Richieste contatto</h1>
     <p class="section-note">Messaggi inviati dal form pubblico del sito.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    {% include 'components/flash.twig' %}
 </section>
 
 <section>
@@ -81,5 +79,6 @@
             </tbody>
         </table>
     </div>
+    {% include 'components/pagination.twig' with { pagination: pagination } %}
 </section>
 {% endblock %}

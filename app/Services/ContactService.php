@@ -35,7 +35,23 @@ final class ContactService
 
     public function listAll(array $filters = []): array
     {
-        return $this->requests->all($filters);
+        return $this->requests->paginated($filters, 500, 0);
+    }
+
+    public function paginate(array $filters = [], int $page = 1, int $perPage = 20): array
+    {
+        $page = max(1, $page);
+        $perPage = max(1, min(100, $perPage));
+        $total = $this->requests->count($filters);
+        $offset = ($page - 1) * $perPage;
+
+        return [
+            'items' => $this->requests->paginated($filters, $perPage, $offset),
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'pages' => max(1, (int) ceil($total / $perPage)),
+        ];
     }
 
     public function updateStatus(int $id, string $status): void

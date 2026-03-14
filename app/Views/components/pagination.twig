@@ -1,0 +1,20 @@
+{% if pagination %}
+    <div class="pagination">
+        <span class="pagination__summary">Pagina {{ pagination.page }} di {{ pagination.pages }} · {{ pagination.total }} elementi</span>
+        <div class="pagination__links">
+            {% if pagination.prev_url %}
+                <a class="button button--ghost button--tiny" href="{{ pagination.prev_url }}">Prec.</a>
+            {% endif %}
+            {% for link in pagination.links %}
+                {% if link.is_current %}
+                    <span class="pill pill--tiny">{{ link.page }}</span>
+                {% else %}
+                    <a class="button button--ghost button--tiny" href="{{ link.url }}">{{ link.page }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.next_url %}
+                <a class="button button--ghost button--tiny" href="{{ pagination.next_url }}">Succ.</a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

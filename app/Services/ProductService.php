@@ -18,6 +18,27 @@ final class ProductService
 
     public function listAllForAdmin(array $filters = []): array
     {
+        return $this->hydrateAdminProducts($this->products->paginatedForAdmin($filters, 500, 0));
+    }
+
+    public function paginateForAdmin(array $filters = [], int $page = 1, int $perPage = 20): array
+    {
+        $page = max(1, $page);
+        $perPage = max(1, min(100, $perPage));
+        $total = $this->products->countForAdmin($filters);
+        $offset = ($page - 1) * $perPage;
+
+        return [
+            'items' => $this->hydrateAdminProducts($this->products->paginatedForAdmin($filters, $perPage, $offset)),
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'pages' => max(1, (int) ceil($total / $perPage)),
+        ];
+    }
+
+    private function hydrateAdminProducts(array $products): array
+    {
         return array_map(function (array $product): array {
             $path = $product['primary_image_path'] ?? null;
             $product['primary_image_url'] = $path
@@ -29,7 +50,7 @@ final class ProductService
             }, $this->images->byProductId((int) $product['id']));
 
             return $product;
-        }, $this->products->allForAdmin($filters));
+        }, $products);
     }
 
     public function latest(int $limit = 12): array
@@ -92,9 +113,14 @@ final class ProductService
     private function normalizeProductInput(array $input): array
     {
         $name = trim((string) ($input['name'] ?? ''));
+        $status = (string) ($input['status'] ?? 'draft');
 
         if ((int) ($input['category_id'] ?? 0) <= 0 || $name === '') {
             throw new RuntimeException('Categoria e nome sono obbligatori.');
+        }
+
+        if (!in_array($status, ['draft', 'published'], true)) {
+            throw new RuntimeException('Stato prodotto non valido.');
         }
 
         return [
@@ -112,7 +138,7 @@ final class ProductService
             'whatsapp_enabled' => isset($input['whatsapp_enabled']) ? 1 : 0,
             'telegram_enabled' => isset($input['telegram_enabled']) ? 1 : 0,
             'share_enabled' => isset($input['share_enabled']) ? 1 : 0,
-            'status' => (string) ($input['status'] ?? 'draft'),
+            'status' => $status,
         ];
     }
 

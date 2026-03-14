@@ -5,9 +5,7 @@
     <span class="eyebrow">Admin prodotti</span>
     <h1>Nuovo prodotto</h1>
     <p>Crea un nuovo articolo in una pagina dedicata, senza affollare l'elenco prodotti.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    {% include 'components/flash.twig' %}
 </section>
 
 <section>
@@ -18,51 +16,51 @@
             <select name="category_id" required>
                 <option value="">Seleziona una categoria</option>
                 {% for category in categories %}
-                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    <option value="{{ category.id }}" {{ old.category_id|default('') == category.id ? 'selected' : '' }}>{{ category.name }}</option>
                 {% endfor %}
             </select>
         </label>
         <label>
             <span>Nome prodotto</span>
-            <input type="text" name="name" required>
+            <input type="text" name="name" value="{{ old.name|default('') }}" required>
         </label>
         <label>
             <span>SKU</span>
-            <input type="text" name="sku">
+            <input type="text" name="sku" value="{{ old.sku|default('') }}">
         </label>
         <label>
             <span>Descrizione breve</span>
-            <input type="text" name="short_description">
+            <input type="text" name="short_description" value="{{ old.short_description|default('') }}">
         </label>
         <label>
             <span>Descrizione completa</span>
-            <textarea name="description" rows="5"></textarea>
+            <textarea name="description" rows="5">{{ old.description|default('') }}</textarea>
         </label>
         <label>
             <span>Materiali</span>
-            <input type="text" name="materials">
+            <input type="text" name="materials" value="{{ old.materials|default('') }}">
         </label>
         <label>
             <span>Tecnica</span>
-            <input type="text" name="technique">
+            <input type="text" name="technique" value="{{ old.technique|default('') }}">
         </label>
         <label>
             <span>Etichetta prezzo</span>
-            <input type="text" name="price_label" value="Prezzo su richiesta">
+            <input type="text" name="price_label" value="{{ old.price_label|default('Prezzo su richiesta') }}">
         </label>
         <label>
             <span>Stato</span>
             <select name="status">
-                <option value="draft">Bozza</option>
-                <option value="published">Pubblicato</option>
+                <option value="draft" {{ old.status|default('draft') == 'draft' ? 'selected' : '' }}>Bozza</option>
+                <option value="published" {{ old.status|default('draft') == 'published' ? 'selected' : '' }}>Pubblicato</option>
             </select>
         </label>
         <div class="checkbox-grid">
-            <label class="checkbox"><input type="checkbox" name="is_customizable"><span>Personalizzabile</span></label>
-            <label class="checkbox"><input type="checkbox" name="is_featured"><span>In evidenza</span></label>
-            <label class="checkbox"><input type="checkbox" name="whatsapp_enabled" checked><span>WhatsApp</span></label>
-            <label class="checkbox"><input type="checkbox" name="telegram_enabled" checked><span>Telegram</span></label>
-            <label class="checkbox"><input type="checkbox" name="share_enabled" checked><span>Condivisione</span></label>
+            <label class="checkbox"><input type="checkbox" name="is_customizable" {{ old.is_customizable is defined ? 'checked' : '' }}><span>Personalizzabile</span></label>
+            <label class="checkbox"><input type="checkbox" name="is_featured" {{ old.is_featured is defined ? 'checked' : '' }}><span>In evidenza</span></label>
+            <label class="checkbox"><input type="checkbox" name="whatsapp_enabled" {{ old ? (old.whatsapp_enabled is defined ? 'checked' : '') : 'checked' }}><span>WhatsApp</span></label>
+            <label class="checkbox"><input type="checkbox" name="telegram_enabled" {{ old ? (old.telegram_enabled is defined ? 'checked' : '') : 'checked' }}><span>Telegram</span></label>
+            <label class="checkbox"><input type="checkbox" name="share_enabled" {{ old ? (old.share_enabled is defined ? 'checked' : '') : 'checked' }}><span>Condivisione</span></label>
         </div>
         <div class="hero__actions">
             <button class="button" type="submit">Salva prodotto</button>

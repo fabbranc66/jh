@@ -12,7 +12,22 @@ final class ProductRepository
     {
     }
 
-    public function allForAdmin(array $filters = []): array
+    public function countForAdmin(array $filters = []): int
+    {
+        [$whereSql, $params] = $this->buildAdminFilterClause($filters);
+
+        $statement = $this->pdo->prepare(
+            'SELECT COUNT(*)
+             FROM products p
+             INNER JOIN categories c ON c.id = p.category_id
+             ' . $whereSql
+        );
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    public function paginatedForAdmin(array $filters = [], int $limit = 20, int $offset = 0): array
     {
         $sql = 'SELECT p.id, p.name, p.slug, p.sku, p.price_label, p.status, p.is_featured, p.is_customizable,
                        c.name AS category_name, c.id AS category_id,
@@ -24,31 +39,42 @@ final class ProductRepository
                            LIMIT 1
                        ) AS primary_image_path
                 FROM products p
-                INNER JOIN categories c ON c.id = p.category_id
-                WHERE 1=1';
+                INNER JOIN categories c ON c.id = p.category_id ';
+        [$whereSql, $params] = $this->buildAdminFilterClause($filters);
+        $sql .= $whereSql . ' ORDER BY p.id DESC LIMIT :limit OFFSET :offset';
+
+        $statement = $this->pdo->prepare($sql);
+        foreach ($params as $key => $value) {
+            $statement->bindValue(':' . $key, $value);
+        }
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    private function buildAdminFilterClause(array $filters): array
+    {
+        $where = ['1=1'];
         $params = [];
 
         if (($filters['q'] ?? '') !== '') {
-            $sql .= ' AND (p.name LIKE :q OR p.sku LIKE :q OR p.slug LIKE :q)';
+            $where[] = '(p.name LIKE :q OR p.sku LIKE :q OR p.slug LIKE :q)';
             $params['q'] = '%' . $filters['q'] . '%';
         }
 
         if (($filters['status'] ?? '') !== '') {
-            $sql .= ' AND p.status = :status';
+            $where[] = 'p.status = :status';
             $params['status'] = $filters['status'];
         }
 
         if ((int) ($filters['category_id'] ?? 0) > 0) {
-            $sql .= ' AND p.category_id = :category_id';
+            $where[] = 'p.category_id = :category_id';
             $params['category_id'] = (int) $filters['category_id'];
         }
 
-        $sql .= ' ORDER BY p.id DESC';
-
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute($params);
-
-        return $statement->fetchAll();
+        return ['WHERE ' . implode(' AND ', $where), $params];
     }
 
     public function latestActive(int $limit = 12): array

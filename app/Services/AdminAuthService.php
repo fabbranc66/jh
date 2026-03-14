@@ -7,10 +7,21 @@ namespace App\Services;
 final class AdminAuthService
 {
     private const SESSION_KEY = 'admin_auth';
+    private const SESSION_TTL = 28800;
 
     public function isAuthenticated(): bool
     {
-        return !empty($_SESSION[self::SESSION_KEY]);
+        $session = $_SESSION[self::SESSION_KEY] ?? null;
+        if (!is_array($session) || empty($session['username'])) {
+            return false;
+        }
+
+        if (($session['logged_in_at'] ?? 0) < (time() - self::SESSION_TTL)) {
+            unset($_SESSION[self::SESSION_KEY]);
+            return false;
+        }
+
+        return true;
     }
 
     public function username(): string

@@ -471,6 +471,31 @@ h3 {
     border: 1px solid #ebbbb7;
 }
 
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.pagination__summary {
+    color: #6b3f1f;
+    font-size: 0.9rem;
+}
+
+.pagination__links {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.admin-inline-form {
+    margin-top: 10px;
+}
+
 .login-shell {
     max-width: 520px;
     margin: 0 auto;

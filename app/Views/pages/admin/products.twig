@@ -5,9 +5,7 @@
     <span class="eyebrow">Admin prodotti</span>
     <h1>Prodotti</h1>
     <p>Inserimento rapido del catalogo con status, personalizzazione e visibilita.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    {% include 'components/flash.twig' %}
 </section>
 
 <section>
@@ -80,5 +78,6 @@
             </tbody>
         </table>
     </div>
+    {% include 'components/pagination.twig' with { pagination: pagination } %}
 </section>
 {% endblock %}

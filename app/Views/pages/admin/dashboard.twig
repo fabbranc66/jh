@@ -5,9 +5,7 @@
     <span class="eyebrow">Backoffice</span>
     <h1>Dashboard mini admin</h1>
     <p>Base leggera per gestire il catalogo senza dipendere da CMS o pannelli complessi.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    {% include 'components/flash.twig' %}
 </section>
 
 <section>
@@ -19,7 +17,7 @@
         </article>
         <article class="card">
             <h2>Prodotti</h2>
-            <p>{{ products|length }} presenti nel catalogo.</p>
+            <p>{{ productsCount }} presenti nel catalogo.</p>
             <div class="hero__actions">
                 <a class="button" href="{{ app.url }}/admin/prodotti">Gestisci prodotti</a>
                 <a class="button button--ghost" href="{{ app.url }}/admin/prodotti/nuovo">Nuovo prodotto</a>
@@ -27,7 +25,7 @@
         </article>
         <article class="card">
             <h2>Contatti</h2>
-            <p>Consulta le richieste inviate dal form pubblico.</p>
+            <p>{{ contactsCount }} richieste salvate dal form pubblico.</p>
             <a class="button" href="{{ app.url }}/admin/contatti">Apri richieste</a>
         </article>
     </div>

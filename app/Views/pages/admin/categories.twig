@@ -5,9 +5,7 @@
     <span class="eyebrow">Admin categorie</span>
     <h1>Categorie</h1>
     <p>Inserisci nuove linee del catalogo e tieni ordinata la struttura del sito.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    {% include 'components/flash.twig' %}
 </section>
 
 <section>
@@ -16,18 +14,18 @@
         {% include 'components/csrf.twig' %}
         <label>
             <span>Nome</span>
-            <input type="text" name="name" required>
+            <input type="text" name="name" value="{{ old.name|default('') }}" required>
         </label>
         <label>
             <span>Descrizione</span>
-            <textarea name="description" rows="4"></textarea>
+            <textarea name="description" rows="4">{{ old.description|default('') }}</textarea>
         </label>
         <label>
             <span>Ordine</span>
-            <input type="number" name="sort_order" value="0">
+            <input type="number" name="sort_order" value="{{ old.sort_order|default(0) }}">
         </label>
         <label class="checkbox">
-            <input type="checkbox" name="is_active" checked>
+            <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : 'checked' }}>
             <span>Attiva subito</span>
         </label>
         <button class="button" type="submit">Salva categoria</button>

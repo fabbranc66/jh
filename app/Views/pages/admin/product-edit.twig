@@ -5,9 +5,7 @@
     <span class="eyebrow">Admin prodotti</span>
     <h1>Modifica prodotto</h1>
     <p class="section-note">Aggiorna i dati dell'articolo senza reinserirlo da zero.</p>
-    {% if flash %}
-        <div class="flash flash--{{ flash.type }}">{{ flash.message }}</div>
-    {% endif %}
+    {% include 'components/flash.twig' %}
 </section>
 
 <section class="section-tight">
@@ -18,65 +16,65 @@
                 <span>Categoria</span>
                 <select name="category_id" required>
                     {% for category in categories %}
-                        <option value="{{ category.id }}" {{ category.id == product.category_id ? 'selected' : '' }}>{{ category.name }}</option>
+                        <option value="{{ category.id }}" {{ old.category_id|default(product.category_id) == category.id ? 'selected' : '' }}>{{ category.name }}</option>
                     {% endfor %}
                 </select>
             </label>
             <label>
                 <span>Nome prodotto</span>
-                <input type="text" name="name" value="{{ product.name }}" required>
+                <input type="text" name="name" value="{{ old.name|default(product.name) }}" required>
             </label>
             <label>
                 <span>SKU</span>
-                <input type="text" name="sku" value="{{ product.sku }}">
+                <input type="text" name="sku" value="{{ old.sku|default(product.sku) }}">
             </label>
             <label>
                 <span>Tecnica</span>
-                <input type="text" name="technique" value="{{ product.technique }}">
+                <input type="text" name="technique" value="{{ old.technique|default(product.technique) }}">
             </label>
             <label>
                 <span>Etichetta prezzo</span>
-                <input type="text" name="price_label" value="{{ product.price_label }}">
+                <input type="text" name="price_label" value="{{ old.price_label|default(product.price_label) }}">
             </label>
             <label>
                 <span>Stato</span>
                 <select name="status">
-                    <option value="draft" {{ product.status == 'draft' ? 'selected' : '' }}>Bozza</option>
-                    <option value="published" {{ product.status == 'published' ? 'selected' : '' }}>Pubblicato</option>
+                    <option value="draft" {{ old.status|default(product.status) == 'draft' ? 'selected' : '' }}>Bozza</option>
+                    <option value="published" {{ old.status|default(product.status) == 'published' ? 'selected' : '' }}>Pubblicato</option>
                 </select>
             </label>
         </div>
         <label>
             <span>Descrizione breve</span>
-            <input type="text" name="short_description" value="{{ product.short_description }}">
+            <input type="text" name="short_description" value="{{ old.short_description|default(product.short_description) }}">
         </label>
         <div class="compact-grid compact-grid--2">
             <label>
                 <span>Materiali</span>
-                <input type="text" name="materials" value="{{ product.materials }}">
+                <input type="text" name="materials" value="{{ old.materials|default(product.materials) }}">
             </label>
             <div class="checkbox-grid">
-                <label class="checkbox"><input type="checkbox" name="is_customizable" {{ product.is_customizable ? 'checked' : '' }}><span>Personalizzabile</span></label>
-                <label class="checkbox"><input type="checkbox" name="is_featured" {{ product.is_featured ? 'checked' : '' }}><span>In evidenza</span></label>
-                <label class="checkbox"><input type="checkbox" name="whatsapp_enabled" {{ product.whatsapp_enabled ? 'checked' : '' }}><span>WhatsApp</span></label>
-                <label class="checkbox"><input type="checkbox" name="telegram_enabled" {{ product.telegram_enabled ? 'checked' : '' }}><span>Telegram</span></label>
-                <label class="checkbox"><input type="checkbox" name="share_enabled" {{ product.share_enabled ? 'checked' : '' }}><span>Condivisione</span></label>
+                <label class="checkbox"><input type="checkbox" name="is_customizable" {{ old ? (old.is_customizable is defined ? 'checked' : '') : (product.is_customizable ? 'checked' : '') }}><span>Personalizzabile</span></label>
+                <label class="checkbox"><input type="checkbox" name="is_featured" {{ old ? (old.is_featured is defined ? 'checked' : '') : (product.is_featured ? 'checked' : '') }}><span>In evidenza</span></label>
+                <label class="checkbox"><input type="checkbox" name="whatsapp_enabled" {{ old ? (old.whatsapp_enabled is defined ? 'checked' : '') : (product.whatsapp_enabled ? 'checked' : '') }}><span>WhatsApp</span></label>
+                <label class="checkbox"><input type="checkbox" name="telegram_enabled" {{ old ? (old.telegram_enabled is defined ? 'checked' : '') : (product.telegram_enabled ? 'checked' : '') }}><span>Telegram</span></label>
+                <label class="checkbox"><input type="checkbox" name="share_enabled" {{ old ? (old.share_enabled is defined ? 'checked' : '') : (product.share_enabled ? 'checked' : '') }}><span>Condivisione</span></label>
             </div>
         </div>
         <div class="checkbox-grid">
             <label>
                 <span>Descrizione completa</span>
-                <textarea name="description" rows="5">{{ product.description }}</textarea>
+                <textarea name="description" rows="5">{{ old.description|default(product.description) }}</textarea>
             </label>
         </div>
         <div class="hero__actions">
             <button class="button button--small" type="submit">Salva modifiche</button>
-            <form method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/elimina" onsubmit="return confirm('Eliminare questo prodotto?');">
-                {% include 'components/csrf.twig' %}
-                <button class="button button--ghost button--small" type="submit">Elimina prodotto</button>
-            </form>
             <a class="button button--ghost button--small" href="{{ app.url }}/admin/prodotti">Torna ai prodotti</a>
         </div>
+    </form>
+    <form class="admin-inline-form" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/elimina" onsubmit="return confirm('Eliminare questo prodotto?');">
+        {% include 'components/csrf.twig' %}
+        <button class="button button--ghost button--small" type="submit">Elimina prodotto</button>
     </form>
 </section>
 
