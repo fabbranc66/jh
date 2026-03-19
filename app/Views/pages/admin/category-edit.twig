@@ -28,11 +28,32 @@
             <span>Descrizione</span>
             <textarea name="description" rows="5">{{ old.description|default(category.description) }}</textarea>
         </label>
+        <input type="hidden" name="image" value="{{ old.image|default(category.image) }}">
         <div class="hero__actions">
             <button class="button button--small" type="submit">Salva modifiche</button>
             <a class="button button--ghost button--small" href="{{ app.url }}/admin/categorie">Torna alle categorie</a>
         </div>
     </form>
+    <div class="section-tight">
+        <h2>Immagine categoria</h2>
+        {% if category.image %}
+            <div class="branding-preview">
+                <img class="branding-preview__image" src="{{ app.url }}/{{ category.image }}?v={{ app.asset_version }}" alt="{{ category.name }}">
+            </div>
+        {% endif %}
+        <form class="admin-form admin-form--compact" method="post" enctype="multipart/form-data" action="{{ app.url }}/admin/categorie/{{ category.id }}/immagine">
+            {% include 'components/csrf.twig' %}
+            <div class="compact-grid compact-grid--2 compact-grid--align-end">
+                <label>
+                    <span>Nuova immagine</span>
+                    <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+                </label>
+                <div class="compact-actions">
+                    <button class="button button--small" type="submit">Carica immagine</button>
+                </div>
+            </div>
+        </form>
+    </div>
     <form class="admin-inline-form" method="post" action="{{ app.url }}/admin/categorie/{{ category.id }}/elimina" onsubmit="return confirm('Eliminare questa categoria?');">
         {% include 'components/csrf.twig' %}
         <button class="button button--ghost button--small" type="submit">Elimina categoria</button>

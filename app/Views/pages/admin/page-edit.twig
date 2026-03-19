@@ -1,0 +1,64 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Contenuti</span>
+    <h1>Modifica pagina</h1>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/pagine/{{ pageItem.id }}/modifica">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Titolo</span>
+                <input type="text" name="title" value="{{ old.title|default(pageItem.title) }}" required>
+            </label>
+            <label>
+                <span>Slug</span>
+                <input type="text" name="slug" value="{{ old.slug|default(pageItem.slug) }}" required>
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : (pageItem.is_active ? 'checked' : '') }}>
+                <span>Pagina attiva</span>
+            </label>
+        </div>
+        <label>
+            <span>Meta title</span>
+            <input type="text" name="meta_title" value="{{ old.meta_title|default(pageItem.meta_title) }}">
+        </label>
+        <label>
+            <span>Meta description</span>
+            <textarea name="meta_description" rows="3">{{ old.meta_description|default(pageItem.meta_description) }}</textarea>
+        </label>
+        <label>
+            <span>Contenuto</span>
+            <textarea name="content" rows="8">{{ old.content|default(pageItem.content) }}</textarea>
+        </label>
+        <input type="hidden" name="image_path" value="{{ old.image_path|default(pageItem.image_path) }}">
+        <button class="button button--small" type="submit">Salva contenuti</button>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Immagine pagina</h2>
+    {% if pageItem.image_path %}
+        <div class="branding-preview">
+            <img class="branding-preview__image" src="{{ app.url }}/{{ pageItem.image_path }}?v={{ app.asset_version }}" alt="{{ pageItem.title }}">
+        </div>
+    {% endif %}
+    <form class="admin-form admin-form--compact" method="post" enctype="multipart/form-data" action="{{ app.url }}/admin/pagine/{{ pageItem.id }}/immagine">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--2 compact-grid--align-end">
+            <label>
+                <span>Nuova immagine</span>
+                <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+            </label>
+            <div class="compact-actions">
+                <button class="button button--small" type="submit">Carica immagine</button>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

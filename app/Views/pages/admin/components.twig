@@ -1,0 +1,140 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Operativo</span>
+    <h1>Componenti e materiali</h1>
+    <p class="section-note">Anagrafica tecnica per distinta base, giacenze, soglie e link di acquisto.</p>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="get" action="{{ app.url }}/admin/componenti">
+        <div class="compact-grid compact-grid--3 compact-grid--align-end">
+            <label>
+                <span>Cerca</span>
+                <input type="text" name="q" value="{{ filters.q|default('') }}" placeholder="Codice, nome, fornitore">
+            </label>
+            <label>
+                <span>Stato</span>
+                <select name="status">
+                    <option value="">Tutti</option>
+                    <option value="active" {{ filters.status == 'active' ? 'selected' : '' }}>Attivi</option>
+                    <option value="inactive" {{ filters.status == 'inactive' ? 'selected' : '' }}>Non attivi</option>
+                </select>
+            </label>
+            <label>
+                <span>Stock</span>
+                <select name="stock">
+                    <option value="">Tutto</option>
+                    <option value="reorder" {{ filters.stock == 'reorder' ? 'selected' : '' }}>Da riordinare</option>
+                </select>
+            </label>
+        </div>
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Applica filtri</button>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/componenti">Reset</a>
+            <span class="pill">{{ reorderCount }} componenti sotto soglia</span>
+        </div>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Nuovo componente</h2>
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/componenti">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Codice</span>
+                <input type="text" name="code" value="{{ old.code|default('') }}" required>
+            </label>
+            <label>
+                <span>Nome</span>
+                <input type="text" name="name" value="{{ old.name|default('') }}" required>
+            </label>
+            <label>
+                <span>Categoria</span>
+                <input type="text" name="category" value="{{ old.category|default('') }}">
+            </label>
+            <label>
+                <span>Unita</span>
+                <input type="text" name="unit" value="{{ old.unit|default('pz') }}">
+            </label>
+            <label>
+                <span>Giacenza</span>
+                <input type="number" step="0.001" name="current_stock" value="{{ old.current_stock|default('0') }}">
+            </label>
+            <label>
+                <span>Soglia riordino</span>
+                <input type="number" step="0.001" name="reorder_level" value="{{ old.reorder_level|default('0') }}">
+            </label>
+            <label>
+                <span>Fornitore</span>
+                <input type="text" name="supplier_name" value="{{ old.supplier_name|default('') }}">
+            </label>
+            <label>
+                <span>Codice fornitore</span>
+                <input type="text" name="supplier_sku" value="{{ old.supplier_sku|default('') }}">
+            </label>
+            <label>
+                <span>Link acquisto</span>
+                <input type="url" name="purchase_url" value="{{ old.purchase_url|default('') }}">
+            </label>
+        </div>
+        <label>
+            <span>Note</span>
+            <textarea name="notes" rows="3">{{ old.notes|default('') }}</textarea>
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : 'checked' }}>
+            <span>Componente attivo</span>
+        </label>
+        <button class="button button--small" type="submit">Crea componente</button>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Elenco componenti</h2>
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Codice</th>
+                    <th>Componente</th>
+                    <th>Categoria</th>
+                    <th>Giacenza</th>
+                    <th>Soglia</th>
+                    <th>Fornitore</th>
+                    <th>Acquisto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for component in components %}
+                    <tr>
+                        <td><span class="pill pill--tiny">{{ component.code }}</span></td>
+                        <td>
+                            <a class="pill pill--link" href="{{ app.url }}/admin/componenti/{{ component.id }}/modifica">{{ component.name }}</a>
+                        </td>
+                        <td>{{ component.category ?: 'N/D' }}</td>
+                        <td>{{ component.current_stock }} {{ component.unit }}</td>
+                        <td>{{ component.reorder_level }} {{ component.unit }}</td>
+                        <td>{{ component.supplier_name ?: 'N/D' }}</td>
+                        <td>
+                            {% if component.purchase_url %}
+                                <a href="{{ component.purchase_url }}" target="_blank" rel="noopener noreferrer">Apri link</a>
+                            {% else %}
+                                <span class="section-note">N/D</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">Nessun componente trovato.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'components/pagination.twig' with { pagination: pagination } %}
+</section>
+{% endblock %}

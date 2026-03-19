@@ -29,6 +29,14 @@
                 <input type="text" name="sku" value="{{ old.sku|default(product.sku) }}">
             </label>
             <label>
+                <span>Tipo articolo</span>
+                <select name="product_type">
+                    <option value="finished" {{ old.product_type|default(product.product_type) == 'finished' ? 'selected' : '' }}>Finito</option>
+                    <option value="kit" {{ old.product_type|default(product.product_type) == 'kit' ? 'selected' : '' }}>Kit</option>
+                    <option value="service" {{ old.product_type|default(product.product_type) == 'service' ? 'selected' : '' }}>Servizio</option>
+                </select>
+            </label>
+            <label>
                 <span>Tecnica</span>
                 <input type="text" name="technique" value="{{ old.technique|default(product.technique) }}">
             </label>
@@ -53,6 +61,18 @@
                 <span>Materiali</span>
                 <input type="text" name="materials" value="{{ old.materials|default(product.materials) }}">
             </label>
+            <label>
+                <span>Tempo produzione (ore)</span>
+                <input type="number" step="0.01" name="production_time_hours" value="{{ old.production_time_hours|default(product.production_time_hours) }}">
+            </label>
+            <label>
+                <span>Costo interno</span>
+                <input type="number" step="0.01" name="internal_cost" value="{{ old.internal_cost|default(product.internal_cost) }}">
+            </label>
+            <label>
+                <span>Scorta minima</span>
+                <input type="number" step="0.001" name="minimum_stock" value="{{ old.minimum_stock|default(product.minimum_stock) }}">
+            </label>
             <div class="checkbox-grid">
                 <label class="checkbox"><input type="checkbox" name="is_customizable" {{ old ? (old.is_customizable is defined ? 'checked' : '') : (product.is_customizable ? 'checked' : '') }}><span>Personalizzabile</span></label>
                 <label class="checkbox"><input type="checkbox" name="is_featured" {{ old ? (old.is_featured is defined ? 'checked' : '') : (product.is_featured ? 'checked' : '') }}><span>In evidenza</span></label>
@@ -67,6 +87,10 @@
                 <textarea name="description" rows="5">{{ old.description|default(product.description) }}</textarea>
             </label>
         </div>
+        <label>
+            <span>Note interne</span>
+            <textarea name="internal_notes" rows="4">{{ old.internal_notes|default(product.internal_notes) }}</textarea>
+        </label>
         <div class="hero__actions">
             <button class="button button--small" type="submit">Salva modifiche</button>
             <a class="button button--ghost button--small" href="{{ app.url }}/admin/prodotti">Torna ai prodotti</a>
@@ -76,6 +100,93 @@
         {% include 'components/csrf.twig' %}
         <button class="button button--ghost button--small" type="submit">Elimina prodotto</button>
     </form>
+</section>
+
+<section class="section-tight">
+    <h2>Distinta base</h2>
+    <p class="section-note">Componenti necessari per produrre l'articolo, con quantita e scarti.</p>
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/prodotti/{{ product.id }}/distinta-base">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3 compact-grid--align-end">
+            <label>
+                <span>Componente</span>
+                <select name="component_id" required>
+                    <option value="">Seleziona</option>
+                    {% for component in components %}
+                        <option value="{{ component.id }}">{{ component.code }} · {{ component.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Quantita</span>
+                <input type="number" step="0.001" name="quantity" value="1" required>
+            </label>
+            <label>
+                <span>Unita</span>
+                <input type="text" name="unit" value="pz">
+            </label>
+            <label>
+                <span>Scarto %</span>
+                <input type="number" step="0.01" name="waste_percent" value="0">
+            </label>
+            <label>
+                <span>Note</span>
+                <input type="text" name="notes" value="">
+            </label>
+            <div class="compact-actions">
+                <button class="button button--small" type="submit">Aggiungi voce</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Codice</th>
+                    <th>Componente</th>
+                    <th>Qt</th>
+                    <th>Scarto</th>
+                    <th>Giacenza</th>
+                    <th>Acquisto</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bomItems %}
+                    <tr>
+                        <td><span class="pill pill--tiny">{{ item.component_code }}</span></td>
+                        <td>{{ item.component_name }}</td>
+                        <td>{{ item.quantity }} {{ item.unit }}</td>
+                        <td>{{ item.waste_percent }}%</td>
+                        <td>
+                            {{ item.current_stock }}
+                            {% if item.current_stock <= item.reorder_level %}
+                                <span class="pill pill--tiny">Riordino</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.purchase_url %}
+                                <a href="{{ item.purchase_url }}" target="_blank" rel="noopener noreferrer">Apri</a>
+                            {% else %}
+                                <span class="section-note">N/D</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{{ app.url }}/admin/distinta-base/{{ item.id }}/elimina">
+                                {% include 'components/csrf.twig' %}
+                                <button class="button button--ghost button--tiny" type="submit">Rimuovi</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">Nessuna voce presente nella distinta base.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <section class="section-tight">

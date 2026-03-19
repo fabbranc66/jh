@@ -1,0 +1,62 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Homepage</span>
+    <h1>Modifica slide</h1>
+    <p class="section-note">Aggiorna immagine, testo e link dello slideshow principale.</p>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/slides/{{ slide.id }}/modifica">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Titolo</span>
+                <input type="text" name="title" value="{{ old.title|default(slide.title) }}" required>
+            </label>
+            <label>
+                <span>Bottone</span>
+                <input type="text" name="button_label" value="{{ old.button_label|default(slide.button_label) }}" required>
+            </label>
+            <label>
+                <span>Ordine</span>
+                <input type="number" name="sort_order" value="{{ old.sort_order|default(slide.sort_order) }}">
+            </label>
+        </div>
+        <label>
+            <span>Sottotitolo</span>
+            <input type="text" name="subtitle" value="{{ old.subtitle|default(slide.subtitle) }}">
+        </label>
+        <div class="compact-grid compact-grid--2">
+            <label>
+                <span>URL immagine</span>
+                <input type="url" name="image_url" value="{{ old.image_url|default(slide.image_url) }}" required>
+            </label>
+            <label>
+                <span>Link destinazione</span>
+                <input type="text" name="link_url" value="{{ old.link_url|default(slide.link_url) }}" required>
+            </label>
+        </div>
+        <div class="compact-grid compact-grid--2">
+            <div>
+                <span class="admin-field-label">Anteprima</span>
+                <img class="admin-thumb admin-thumb--edit" src="{{ old.image_url|default(slide.image_url) }}" alt="{{ slide.title }}">
+            </div>
+            <label class="checkbox">
+                <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : (slide.is_active ? 'checked' : '') }}>
+                <span>Slide attiva</span>
+            </label>
+        </div>
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Salva slide</button>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/slides">Torna alle slide</a>
+        </div>
+    </form>
+    <form class="admin-inline-form" method="post" action="{{ app.url }}/admin/slides/{{ slide.id }}/elimina" onsubmit="return confirm('Eliminare questa slide?');">
+        {% include 'components/csrf.twig' %}
+        <button class="button button--ghost button--small" type="submit">Elimina slide</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,9 +1,14 @@
 <article class="card">
-    <span class="pill">Categoria</span>
+    {% if category.image %}
+        <a class="card__image-link" href="{{ app.url }}/categoria/{{ category.slug }}">
+            <img class="card__image" src="{{ app.url }}/{{ category.image }}?v={{ app.asset_version }}" alt="{{ category.name }}">
+        </a>
+    {% endif %}
+    <span class="pill">Linea</span>
     <h3>{{ category.name }}</h3>
     <p>{{ category.description ?: 'Linea creativa disponibile nel catalogo.' }}</p>
     <div class="card__footer">
-        <span>Esplora la linea</span>
-        <a href="{{ app.url }}/categoria/{{ category.slug }}">Esplora</a>
+        <span>Scopri la selezione</span>
+        <a href="{{ app.url }}/categoria/{{ category.slug }}">Vai alla linea</a>
     </div>
 </article>

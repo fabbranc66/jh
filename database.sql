@@ -114,6 +114,88 @@ CREATE TABLE IF NOT EXISTS `contact_requests` (
     ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `home_slides` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(180) NOT NULL,
+  `subtitle` VARCHAR(255) NULL,
+  `image_url` VARCHAR(255) NOT NULL,
+  `link_url` VARCHAR(255) NOT NULL,
+  `button_label` VARCHAR(60) NOT NULL DEFAULT 'Scopri',
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_home_slides_active_sort` (`is_active`, `sort_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `site_settings` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `setting_key` VARCHAR(100) NOT NULL,
+  `setting_value` TEXT NULL,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_site_settings_key` (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `components` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` VARCHAR(80) NOT NULL,
+  `name` VARCHAR(180) NOT NULL,
+  `slug` VARCHAR(200) NOT NULL,
+  `category` VARCHAR(100) NULL,
+  `description` TEXT NULL,
+  `unit` VARCHAR(20) NOT NULL DEFAULT 'pz',
+  `current_stock` DECIMAL(12,3) NOT NULL DEFAULT 0,
+  `reorder_level` DECIMAL(12,3) NOT NULL DEFAULT 0,
+  `pack_quantity` DECIMAL(12,3) NULL,
+  `last_price` DECIMAL(10,2) NULL,
+  `supplier_name` VARCHAR(150) NULL,
+  `supplier_sku` VARCHAR(100) NULL,
+  `purchase_url` VARCHAR(255) NULL,
+  `location` VARCHAR(120) NULL,
+  `lead_time_days` INT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `notes` TEXT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_components_code` (`code`),
+  UNIQUE KEY `uq_components_slug` (`slug`),
+  KEY `idx_components_active` (`is_active`),
+  KEY `idx_components_reorder` (`is_active`, `reorder_level`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `product_bom_items` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `product_id` INT UNSIGNED NOT NULL,
+  `component_id` INT UNSIGNED NOT NULL,
+  `quantity` DECIMAL(12,3) NOT NULL DEFAULT 1,
+  `unit` VARCHAR(20) NOT NULL DEFAULT 'pz',
+  `waste_percent` DECIMAL(5,2) NOT NULL DEFAULT 0,
+  `notes` VARCHAR(255) NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_product_component` (`product_id`, `component_id`),
+  KEY `idx_bom_product` (`product_id`),
+  KEY `idx_bom_component` (`component_id`),
+  CONSTRAINT `fk_bom_product`
+    FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_bom_component`
+    FOREIGN KEY (`component_id`) REFERENCES `components` (`id`)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `products`
+  ADD COLUMN IF NOT EXISTS `product_type` VARCHAR(30) NOT NULL DEFAULT 'finished' AFTER `sku`,
+  ADD COLUMN IF NOT EXISTS `production_time_hours` DECIMAL(8,2) NULL AFTER `technique`,
+  ADD COLUMN IF NOT EXISTS `internal_cost` DECIMAL(10,2) NULL AFTER `production_time_hours`,
+  ADD COLUMN IF NOT EXISTS `minimum_stock` DECIMAL(12,3) NULL AFTER `internal_cost`,
+  ADD COLUMN IF NOT EXISTS `internal_notes` TEXT NULL AFTER `minimum_stock`;
+
 INSERT INTO `categories` (`name`, `slug`, `description`, `sort_order`, `is_active`)
 SELECT * FROM (
   SELECT
@@ -125,6 +207,65 @@ SELECT * FROM (
 ) AS tmp
 WHERE NOT EXISTS (
   SELECT 1 FROM `categories` WHERE `slug` = 'gioielli-wire'
+)
+LIMIT 1;
+
+INSERT INTO `home_slides` (`title`, `subtitle`, `image_url`, `link_url`, `button_label`, `sort_order`, `is_active`)
+SELECT * FROM (
+  SELECT
+    'Gioielli da regalare' AS `title`,
+    'Linee curate, tono premium e schede chiare per trovare subito l idea giusta.' AS `subtitle`,
+    'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80' AS `image_url`,
+    '/categoria/gioielli-wire' AS `link_url`,
+    'Vai ai gioielli' AS `button_label`,
+    10 AS `sort_order`,
+    1 AS `is_active`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `home_slides` WHERE `sort_order` = 10
+)
+LIMIT 1;
+
+INSERT INTO `site_settings` (`setting_key`, `setting_value`)
+SELECT * FROM (
+  SELECT
+    'site_logo_path' AS `setting_key`,
+    'assets/images/logo_jh.png' AS `setting_value`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `site_settings` WHERE `setting_key` = 'site_logo_path'
+)
+LIMIT 1;
+
+INSERT INTO `home_slides` (`title`, `subtitle`, `image_url`, `link_url`, `button_label`, `sort_order`, `is_active`)
+SELECT * FROM (
+  SELECT
+    'Regali e ricordi personalizzati' AS `title`,
+    'Piccoli oggetti da scegliere per occasione, tema o significato.' AS `subtitle`,
+    'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1600&q=80' AS `image_url`,
+    '/categoria/eventi' AS `link_url`,
+    'Scopri eventi' AS `button_label`,
+    20 AS `sort_order`,
+    1 AS `is_active`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `home_slides` WHERE `sort_order` = 20
+)
+LIMIT 1;
+
+INSERT INTO `home_slides` (`title`, `subtitle`, `image_url`, `link_url`, `button_label`, `sort_order`, `is_active`)
+SELECT * FROM (
+  SELECT
+    'Decorazioni e stampa 3D' AS `title`,
+    'Oggetti creativi tra artigianato, casa e soluzioni piu contemporanee.' AS `subtitle`,
+    'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=1600&q=80' AS `image_url`,
+    '/categoria/stampa-3d' AS `link_url`,
+    'Apri la collezione' AS `button_label`,
+    30 AS `sort_order`,
+    1 AS `is_active`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `home_slides` WHERE `sort_order` = 30
 )
 LIMIT 1;
 
@@ -245,5 +386,84 @@ SELECT * FROM (
 ) AS tmp
 WHERE NOT EXISTS (
   SELECT 1 FROM `products` WHERE `slug` = 'lampada-luna-3d'
+)
+LIMIT 1;
+
+INSERT INTO `components` (`code`, `name`, `slug`, `category`, `description`, `unit`, `current_stock`, `reorder_level`, `supplier_name`, `purchase_url`, `is_active`)
+SELECT * FROM (
+  SELECT
+    'WIRE-RAME-08' AS `code`,
+    'Filo rame 0.8 mm' AS `name`,
+    'filo-rame-0-8-mm' AS `slug`,
+    'Wire' AS `category`,
+    'Filo per lavorazioni wire wrapping.' AS `description`,
+    'm' AS `unit`,
+    24.000 AS `current_stock`,
+    5.000 AS `reorder_level`,
+    'Fornitore wire' AS `supplier_name`,
+    'https://example.com/wire-rame' AS `purchase_url`,
+    1 AS `is_active`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `components` WHERE `code` = 'WIRE-RAME-08'
+)
+LIMIT 1;
+
+INSERT INTO `components` (`code`, `name`, `slug`, `category`, `description`, `unit`, `current_stock`, `reorder_level`, `supplier_name`, `purchase_url`, `is_active`)
+SELECT * FROM (
+  SELECT
+    'RES-TRASP-1KG' AS `code`,
+    'Resina trasparente 1 kg' AS `name`,
+    'resina-trasparente-1-kg' AS `slug`,
+    'Resina' AS `category`,
+    'Base trasparente per colate artistiche.' AS `description`,
+    'kg' AS `unit`,
+    1.500 AS `current_stock`,
+    1.000 AS `reorder_level`,
+    'Fornitore resina' AS `supplier_name`,
+    'https://example.com/resina-trasparente' AS `purchase_url`,
+    1 AS `is_active`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `components` WHERE `code` = 'RES-TRASP-1KG'
+)
+LIMIT 1;
+
+INSERT INTO `components` (`code`, `name`, `slug`, `category`, `description`, `unit`, `current_stock`, `reorder_level`, `supplier_name`, `purchase_url`, `is_active`)
+SELECT * FROM (
+  SELECT
+    'PLA-BIANCO-1KG' AS `code`,
+    'PLA bianco 1 kg' AS `name`,
+    'pla-bianco-1-kg' AS `slug`,
+    'Stampa 3D' AS `category`,
+    'Filamento PLA per stampa 3D.' AS `description`,
+    'kg' AS `unit`,
+    0.700 AS `current_stock`,
+    1.000 AS `reorder_level`,
+    'Fornitore stampa 3D' AS `supplier_name`,
+    'https://example.com/pla-bianco' AS `purchase_url`,
+    1 AS `is_active`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1 FROM `components` WHERE `code` = 'PLA-BIANCO-1KG'
+)
+LIMIT 1;
+
+INSERT INTO `product_bom_items` (`product_id`, `component_id`, `quantity`, `unit`, `waste_percent`, `notes`, `sort_order`)
+SELECT * FROM (
+  SELECT
+    (SELECT id FROM `products` WHERE `slug` = 'ciondolo-luna-wire' LIMIT 1) AS `product_id`,
+    (SELECT id FROM `components` WHERE `code` = 'WIRE-RAME-08' LIMIT 1) AS `component_id`,
+    2.000 AS `quantity`,
+    'm' AS `unit`,
+    5.00 AS `waste_percent`,
+    'Consumo medio per un ciondolo standard.' AS `notes`,
+    10 AS `sort_order`
+) AS tmp
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM `product_bom_items`
+  WHERE `product_id` = (SELECT id FROM `products` WHERE `slug` = 'ciondolo-luna-wire' LIMIT 1)
+    AND `component_id` = (SELECT id FROM `components` WHERE `code` = 'WIRE-RAME-08' LIMIT 1)
 )
 LIMIT 1;

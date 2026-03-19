@@ -1,13 +1,22 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section class="hero hero--compact">
-    <span class="eyebrow">Categoria</span>
-    <h1>{{ category.name }}</h1>
-    <p>{{ category.description ?: 'Linea di catalogo pronta per essere popolata con prodotti reali.' }}</p>
-    <div class="hero__actions">
-        <a class="button" href="{{ app.url }}/catalogo">Torna al catalogo</a>
-        <a class="button button--ghost" href="{{ app.url }}/contatti">Richiedi una personalizzazione</a>
+<section class="page-band {{ pageBandClass|default('page-band--catalog') }}">
+    <div class="page-band__inner {{ category.image ? 'page-band__inner--media' : '' }}">
+        <div class="page-band__content">
+            <span class="eyebrow">Categoria</span>
+            <h1>{{ category.name }}</h1>
+            <p>{{ category.description ?: 'Linea di catalogo pronta per essere popolata con prodotti reali.' }}</p>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/catalogo">Torna al catalogo</a>
+                <a class="button button--ghost" href="{{ app.url }}/contatti">Richiedi una personalizzazione</a>
+            </div>
+        </div>
+        {% if category.image %}
+            <div class="page-band__media">
+                <img src="{{ app.url }}/{{ category.image }}?v={{ app.asset_version }}" alt="{{ category.name }}">
+            </div>
+        {% endif %}
     </div>
 </section>
 

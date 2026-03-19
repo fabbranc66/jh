@@ -1,19 +1,52 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section class="hero hero--compact">
-    <span class="eyebrow">Catalogo</span>
-    <h1>Catalogo</h1>
-    <p>Esplora le linee gia pubblicate del laboratorio: gioielli, resina, stampa 3D e prodotti pensati per essere richiesti anche in versione personalizzata.</p>
-    <div class="hero__actions">
-        <a class="button" href="{{ app.url }}/contatti">Richiedi un prodotto</a>
-        <a class="button button--ghost" href="{{ app.url }}/laboratorio">Approfondisci il laboratorio</a>
+<section class="page-band {{ pageBandClass|default('page-band--catalog') }}">
+    <div class="page-band__inner {{ page and page.image_path ? 'page-band__inner--media' : '' }}">
+        <div class="page-band__content">
+            <span class="eyebrow">Catalogo</span>
+            <h1>Prodotti, linee creative e punti di partenza per richieste personalizzate.</h1>
+            <p>Il catalogo raccoglie le linee gia pubblicate del laboratorio e mostra il tono del progetto: piccoli oggetti curati, materiali misti, personalizzazioni e una lavorazione pensata piu per il dialogo che per la vendita automatica.</p>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/contatti">Richiedi un prodotto</a>
+                <a class="button button--ghost" href="{{ app.url }}/laboratorio">Approfondisci il laboratorio</a>
+            </div>
+        </div>
+        {% if page and page.image_path %}
+            <div class="page-band__media">
+                <img src="{{ app.url }}/{{ page.image_path }}?v={{ app.asset_version }}" alt="Catalogo JH">
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        {% if searchQuery %}
+            <h2>Risultati per "{{ searchQuery }}"</h2>
+            <p>I prodotti trovati compaiono prima del resto del catalogo, cosi puoi vedere subito l esito della ricerca.</p>
+        {% else %}
+            <h2>Prodotti pubblicati</h2>
+            <p>Le schede prodotto servono come riferimento concreto: puoi usarle cosi come sono oppure come base per varianti, personalizzazioni e richieste piu su misura.</p>
+        {% endif %}
+    </div>
+    <div class="grid grid--3">
+        {% for product in products %}
+            {% include 'components/product-card.twig' with { product: product } %}
+        {% else %}
+            {% if searchQuery %}
+                <p>Nessun risultato trovato per la ricerca inserita.</p>
+            {% else %}
+                <p>Non ci sono ancora prodotti pubblicati in questa fase.</p>
+            {% endif %}
+        {% endfor %}
     </div>
 </section>
 
 <section>
     <div class="section-heading">
         <h2>Naviga per categoria</h2>
+        <p>Se stai cercando un'idea precisa, partire dalla categoria giusta ti aiuta a capire subito materiali, stile e lavorazione.</p>
     </div>
     <div class="grid grid--3">
         {% for category in categories %}
@@ -24,17 +57,24 @@
     </div>
 </section>
 
-<section>
+<section class="info-band">
     <div class="section-heading">
-        <h2>Prodotti pubblicati</h2>
-        <p>Ogni scheda prodotto puo diventare il punto di partenza per una richiesta diretta o per una personalizzazione.</p>
+        <h2>Come leggere il catalogo</h2>
+        <p>Non tutto quello che vedi va interpretato come prodotto fisso e immutabile: gran parte del valore del laboratorio sta nella possibilita di adattare l'idea iniziale.</p>
     </div>
     <div class="grid grid--3">
-        {% for product in products %}
-            {% include 'components/product-card.twig' with { product: product } %}
-        {% else %}
-            <p>Non ci sono ancora prodotti pubblicati in questa fase.</p>
-        {% endfor %}
+        <article class="card card--compact">
+            <h3>Scheda come esempio reale</h3>
+            <p>Le immagini, i materiali e il tono della scheda servono a darti un riferimento concreto da cui partire.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Personalizzazione possibile</h3>
+            <p>Molti articoli possono cambiare in colore, finiture, incisione, nome, tema o destinazione d'uso.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Richiesta guidata</h3>
+            <p>Quando hai dubbi o vuoi una variante, il passaggio giusto e il contatto diretto attraverso il sito.</p>
+        </article>
     </div>
 </section>
 {% endblock %}

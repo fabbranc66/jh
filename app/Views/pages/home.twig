@@ -1,34 +1,43 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section class="hero">
-    <span class="eyebrow">Artigianato contemporaneo tra manualita e tecnologia</span>
-    <h1>Oggetti creativi personalizzati tra handmade, resina e stampa 3D.</h1>
-    <p>JH nasce come catalogo-vetrina per prodotti e lavorazioni su richiesta: gioielli, decorazioni, idee regalo, articoli per eventi e progetti personalizzati realizzati con un approccio artigianale e digitale.</p>
-    <div class="hero__actions">
-        <a class="button" href="{{ app.url }}/catalogo">Vai al catalogo</a>
-        <a class="button button--ghost" href="{{ app.url }}/contatti">Richiedi un prodotto</a>
-    </div>
-    <div class="hero-stats">
-        <div class="hero-stat">
-            <strong>{{ stats.categories }}</strong>
-            <span>categorie attive</span>
+<section class="home-hero">
+    <div class="hero-slider" data-hero-slider>
+        <div class="hero-slider__track" data-hero-track>
+            {% for slide in slides %}
+                <a class="hero-slide {{ loop.first ? 'is-active' : '' }}" href="{{ slide.resolved_link_url }}" data-hero-slide aria-label="{{ slide.title }}">
+                    <img src="{{ slide.image_url }}" alt="{{ slide.title }}">
+                    <div class="hero-slide__overlay"></div>
+                    <div class="hero-slide__content">
+                        <span class="hero-slide__eyebrow">JH collection</span>
+                        <h2>{{ slide.title }}</h2>
+                        {% if slide.subtitle %}
+                            <p>{{ slide.subtitle }}</p>
+                        {% endif %}
+                        <span class="hero-slide__cta">{{ slide.button_label }}</span>
+                    </div>
+                </a>
+            {% else %}
+                <div class="hero-slide is-active">
+                    <div class="hero-slide__content">
+                        <h2>Slide non disponibili</h2>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        <div class="hero-stat">
-            <strong>richiesta diretta</strong>
-            <span>WhatsApp, Telegram o contatto</span>
-        </div>
-        <div class="hero-stat">
-            <strong>personalizzazioni</strong>
-            <span>nomi, colori, dettagli e varianti</span>
-        </div>
+        {% if slides|length > 1 %}
+            <div class="hero-slider__dots" data-hero-dots>
+                {% for slide in slides %}
+                    <button class="hero-slider__dot {{ loop.first ? 'is-active' : '' }}" type="button" data-hero-dot aria-label="Vai alla slide {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </section>
 
-<section>
+<section class="category-strip">
     <div class="section-heading">
-        <h2>Categorie del catalogo</h2>
-        <p>Il progetto e organizzato per linee chiare, cosi puoi esplorare il laboratorio per stile, tecnica o destinazione d'uso.</p>
+        <h2>Acquista per linea</h2>
     </div>
     <div class="grid grid--3">
         {% for category in categories %}
@@ -39,59 +48,16 @@
     </div>
 </section>
 
-<section>
+<section class="featured-strip">
     <div class="section-heading">
         <h2>Prodotti in evidenza</h2>
-        <p>Una selezione dei prodotti gia pubblicati, utile per capire subito materiali, stile e possibilita di personalizzazione.</p>
     </div>
     <div class="grid grid--3">
         {% for product in featuredProducts %}
             {% include 'components/product-card.twig' with { product: product } %}
         {% else %}
-            <p>Non ci sono ancora prodotti pubblicati. Il catalogo e collegato al database e pronto a riceverli.</p>
+            <p>Non ci sono ancora prodotti pubblicati.</p>
         {% endfor %}
-    </div>
-</section>
-
-<section class="info-band">
-    <div>
-        <span class="eyebrow">Come funziona</span>
-        <h2>Prima si esplora, poi si richiede</h2>
-    </div>
-    <div class="grid grid--3">
-        <article class="card card--compact">
-            <h3>1. Scegli il prodotto</h3>
-            <p>Visita il catalogo, apri la scheda e guarda immagini, materiali e dettagli utili.</p>
-        </article>
-        <article class="card card--compact">
-            <h3>2. Personalizza la richiesta</h3>
-            <p>Puoi chiedere varianti, colori, iniziali, nomi, temi evento o altre modifiche.</p>
-        </article>
-        <article class="card card--compact">
-            <h3>3. Contatto diretto</h3>
-            <p>La richiesta parte senza checkout automatico, con un dialogo diretto piu adatto a lavori su misura.</p>
-        </article>
-    </div>
-</section>
-
-<section>
-    <div class="section-heading">
-        <h2>Cosa rende diverso il progetto</h2>
-        <p>Non e solo un catalogo handmade: e una base per un laboratorio creativo scalabile, dove manualita e tecnologie digitali convivono.</p>
-    </div>
-    <div class="grid grid--3">
-        <article class="card card--compact">
-            <h3>Handmade</h3>
-            <p>Wire wrapping, resina artistica, dettagli fatti a mano e piccole serie curate.</p>
-        </article>
-        <article class="card card--compact">
-            <h3>Fabbricazione digitale</h3>
-            <p>Stampa 3D e sviluppo di oggetti personalizzati, decorativi o funzionali.</p>
-        </article>
-        <article class="card card--compact">
-            <h3>Evoluzione futura</h3>
-            <p>La struttura e gia pensata per crescere da vetrina a e-commerce, servizi 3D e aree piu evolute.</p>
-        </article>
     </div>
 </section>
 {% endblock %}

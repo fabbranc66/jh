@@ -1,11 +1,20 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section class="hero hero--compact">
-    <span class="eyebrow">Contatti</span>
-    <h1>Contatti</h1>
-    <p>Usa il form per richieste prodotto, personalizzazioni, idee per eventi o lavorazioni speciali. Il contatto diretto e la base del progetto in questa fase.</p>
-    {% include 'components/flash.twig' %}
+<section class="page-band page-band--contact">
+    <div class="page-band__inner {{ page and page.image_path ? 'page-band__inner--media' : '' }}">
+        <div class="page-band__content">
+            <span class="eyebrow">Contatti</span>
+            <h1>Contatti</h1>
+            <p>Usa il form per richieste prodotto, personalizzazioni, idee per eventi o lavorazioni speciali. Il contatto diretto e la base del progetto in questa fase.</p>
+            {% include 'components/flash.twig' %}
+        </div>
+        {% if page and page.image_path %}
+            <div class="page-band__media">
+                <img src="{{ app.url }}/{{ page.image_path }}?v={{ app.asset_version }}" alt="Contatti JH">
+            </div>
+        {% endif %}
+    </div>
 </section>
 
 <section>

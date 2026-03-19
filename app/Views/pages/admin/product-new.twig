@@ -11,49 +11,75 @@
 <section>
     <form class="admin-form" method="post" action="{{ app.url }}/admin/prodotti">
         {% include 'components/csrf.twig' %}
-        <label>
-            <span>Categoria</span>
-            <select name="category_id" required>
-                <option value="">Seleziona una categoria</option>
-                {% for category in categories %}
-                    <option value="{{ category.id }}" {{ old.category_id|default('') == category.id ? 'selected' : '' }}>{{ category.name }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label>
-            <span>Nome prodotto</span>
-            <input type="text" name="name" value="{{ old.name|default('') }}" required>
-        </label>
-        <label>
-            <span>SKU</span>
-            <input type="text" name="sku" value="{{ old.sku|default('') }}">
-        </label>
-        <label>
-            <span>Descrizione breve</span>
-            <input type="text" name="short_description" value="{{ old.short_description|default('') }}">
-        </label>
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Categoria</span>
+                <select name="category_id" required>
+                    <option value="">Seleziona una categoria</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {{ old.category_id|default('') == category.id ? 'selected' : '' }}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Nome prodotto</span>
+                <input type="text" name="name" value="{{ old.name|default('') }}" required>
+            </label>
+            <label>
+                <span>SKU</span>
+                <input type="text" name="sku" value="{{ old.sku|default('') }}">
+            </label>
+            <label>
+                <span>Tipo articolo</span>
+                <select name="product_type">
+                    <option value="finished" {{ old.product_type|default('finished') == 'finished' ? 'selected' : '' }}>Finito</option>
+                    <option value="kit" {{ old.product_type|default('finished') == 'kit' ? 'selected' : '' }}>Kit</option>
+                    <option value="service" {{ old.product_type|default('finished') == 'service' ? 'selected' : '' }}>Servizio</option>
+                </select>
+            </label>
+            <label>
+                <span>Tecnica</span>
+                <input type="text" name="technique" value="{{ old.technique|default('') }}">
+            </label>
+            <label>
+                <span>Etichetta prezzo</span>
+                <input type="text" name="price_label" value="{{ old.price_label|default('Prezzo su richiesta') }}">
+            </label>
+            <label>
+                <span>Tempo produzione (ore)</span>
+                <input type="number" step="0.01" name="production_time_hours" value="{{ old.production_time_hours|default('') }}">
+            </label>
+            <label>
+                <span>Costo interno</span>
+                <input type="number" step="0.01" name="internal_cost" value="{{ old.internal_cost|default('') }}">
+            </label>
+            <label>
+                <span>Scorta minima</span>
+                <input type="number" step="0.001" name="minimum_stock" value="{{ old.minimum_stock|default('') }}">
+            </label>
+            <label>
+                <span>Materiali</span>
+                <input type="text" name="materials" value="{{ old.materials|default('') }}">
+            </label>
+            <label>
+                <span>Descrizione breve</span>
+                <input type="text" name="short_description" value="{{ old.short_description|default('') }}">
+            </label>
+            <label>
+                <span>Stato</span>
+                <select name="status">
+                    <option value="draft" {{ old.status|default('draft') == 'draft' ? 'selected' : '' }}>Bozza</option>
+                    <option value="published" {{ old.status|default('draft') == 'published' ? 'selected' : '' }}>Pubblicato</option>
+                </select>
+            </label>
+        </div>
         <label>
             <span>Descrizione completa</span>
             <textarea name="description" rows="5">{{ old.description|default('') }}</textarea>
         </label>
         <label>
-            <span>Materiali</span>
-            <input type="text" name="materials" value="{{ old.materials|default('') }}">
-        </label>
-        <label>
-            <span>Tecnica</span>
-            <input type="text" name="technique" value="{{ old.technique|default('') }}">
-        </label>
-        <label>
-            <span>Etichetta prezzo</span>
-            <input type="text" name="price_label" value="{{ old.price_label|default('Prezzo su richiesta') }}">
-        </label>
-        <label>
-            <span>Stato</span>
-            <select name="status">
-                <option value="draft" {{ old.status|default('draft') == 'draft' ? 'selected' : '' }}>Bozza</option>
-                <option value="published" {{ old.status|default('draft') == 'published' ? 'selected' : '' }}>Pubblicato</option>
-            </select>
+            <span>Note interne</span>
+            <textarea name="internal_notes" rows="4">{{ old.internal_notes|default('') }}</textarea>
         </label>
         <div class="checkbox-grid">
             <label class="checkbox"><input type="checkbox" name="is_customizable" {{ old.is_customizable is defined ? 'checked' : '' }}><span>Personalizzabile</span></label>

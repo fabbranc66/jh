@@ -58,9 +58,34 @@ final class ProductService
         return $this->hydratePublicProducts($this->products->latestActive($limit));
     }
 
+    public function search(string $query, int $limit = 24): array
+    {
+        $query = trim($query);
+
+        if ($query === '') {
+            return $this->latest($limit);
+        }
+
+        return $this->hydratePublicProducts($this->products->searchActive($query, $limit));
+    }
+
     public function byCategory(int $categoryId, int $limit = 24): array
     {
         return $this->hydratePublicProducts($this->products->latestActiveByCategory($categoryId, $limit));
+    }
+
+    public function bySlugs(array $slugs): array
+    {
+        $items = [];
+
+        foreach ($slugs as $slug) {
+            $product = $this->findBySlug((string) $slug);
+            if ($product !== null) {
+                $items[] = $product;
+            }
+        }
+
+        return $items;
     }
 
     public function findBySlug(string $slug): ?array
@@ -143,10 +168,15 @@ final class ProductService
             'name' => $name,
             'slug' => $this->slugify($name),
             'sku' => trim((string) ($input['sku'] ?? '')),
+            'product_type' => $this->normalizeProductType((string) ($input['product_type'] ?? 'finished')),
             'short_description' => trim((string) ($input['short_description'] ?? '')),
             'description' => trim((string) ($input['description'] ?? '')),
             'materials' => trim((string) ($input['materials'] ?? '')),
             'technique' => trim((string) ($input['technique'] ?? '')),
+            'production_time_hours' => $this->nullableDecimal($input['production_time_hours'] ?? null, 2),
+            'internal_cost' => $this->nullableDecimal($input['internal_cost'] ?? null, 2),
+            'minimum_stock' => $this->nullableDecimal($input['minimum_stock'] ?? null, 3),
+            'internal_notes' => trim((string) ($input['internal_notes'] ?? '')),
             'price_label' => trim((string) ($input['price_label'] ?? 'Prezzo su richiesta')),
             'is_customizable' => isset($input['is_customizable']) ? 1 : 0,
             'is_featured' => isset($input['is_featured']) ? 1 : 0,
@@ -164,6 +194,20 @@ final class ProductService
         $value = trim($value, '-');
 
         return $value !== '' ? $value : 'prodotto';
+    }
+
+    private function normalizeProductType(string $value): string
+    {
+        return in_array($value, ['finished', 'service', 'kit'], true) ? $value : 'finished';
+    }
+
+    private function nullableDecimal(mixed $value, int $decimals): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return number_format((float) $value, $decimals, '.', '');
     }
 
     private function hydratePublicProducts(array $products): array

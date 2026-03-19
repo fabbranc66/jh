@@ -1,19 +1,57 @@
 <header>
-    <div class="site-header">
-        <a class="site-brand site-brand--solo" href="{{ app.url }}/" aria-label="JH Home">
-            <img class="site-brand__logo" src="{{ app.url }}/assets/images/jh-logo-3d.svg?v={{ app.asset_version }}" alt="JH logo">
-        </a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span class="nav-toggle__label">Menu</span>
-        </button>
+    <div class="site-topbar">
+        <div class="site-topbar__inner">
+            <div class="site-topbar__badge">Spedizione veloce, richiesta diretta e personalizzazioni guidate</div>
+            <div class="site-topbar__links">
+                <a href="{{ app.url }}/contatti">Ti possiamo aiutare?</a>
+                <a href="{{ app.url }}/laboratorio">Chi siamo</a>
+                <a href="{{ app.url }}/contatti">Contattaci</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="site-header-main">
+        <div class="site-header-main__inner">
+            <a class="site-brand site-brand--solo" href="{{ app.url }}/" aria-label="JH Home">
+                <img class="site-brand__logo" src="{{ branding.logo_url }}?v={{ app.asset_version }}" alt="JH logo">
+            </a>
+
+            <form class="site-search" action="{{ app.url }}/catalogo" method="get" role="search">
+                <input type="search" name="q" placeholder="Cerca gioielli, resina, stampa 3D, regali..." aria-label="Cerca nel catalogo">
+                <button type="submit">Cerca</button>
+            </form>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="site-nav-shell">
         <nav class="site-nav" id="site-nav" data-site-nav>
-            <a href="{{ app.url }}/">Home</a>
-            <a href="{{ app.url }}/catalogo">Catalogo</a>
-            <a href="{{ app.url }}/laboratorio">Laboratorio</a>
-            <a href="{{ app.url }}/contatti">Contatti</a>
+            {% for item in navigation.main %}
+                {% if item.children %}
+                    <div class="nav-group">
+                        <a class="nav-group__link" href="{{ item.resolved_url }}">{{ item.label }}</a>
+                        <div class="mega-panel">
+                            {% for child in item.children %}
+                                <a class="mega-panel__card" href="{{ child.resolved_url }}">
+                                    {% if child.resolved_image_url %}
+                                        <span class="mega-panel__card-media">
+                                            <img src="{{ child.resolved_image_url }}?v={{ app.asset_version }}" alt="{{ child.label }}">
+                                        </span>
+                                    {% endif %}
+                                    <span class="mega-panel__card-title">{{ child.label }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ item.resolved_url }}">{{ item.label }}</a>
+                {% endif %}
+            {% endfor %}
         </nav>
     </div>
 </header>

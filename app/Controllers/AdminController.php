@@ -6,8 +6,14 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Services\AdminAuthService;
+use App\Services\BrandingService;
 use App\Services\CategoryService;
+use App\Services\ComponentService;
 use App\Services\ContactService;
+use App\Services\HomeSlideService;
+use App\Services\MenuService;
+use App\Services\PageService;
+use App\Services\ProductBomService;
 use App\Services\ProductImageService;
 use App\Services\ProductService;
 use Throwable;
@@ -20,7 +26,13 @@ final class AdminController
         private CategoryService $categories,
         private ProductService $products,
         private ProductImageService $images,
-        private ContactService $contacts
+        private ContactService $contacts,
+        private ComponentService $components,
+        private ProductBomService $bom,
+        private HomeSlideService $slides,
+        private BrandingService $branding,
+        private MenuService $menu,
+        private PageService $pages
     ) {
     }
 
@@ -36,8 +48,330 @@ final class AdminController
             'categories' => $this->categories->listAll(),
             'productsCount' => $products['total'],
             'contactsCount' => $contacts['total'],
+            'componentsCount' => $this->components->paginateForAdmin([], 1, 1)['total'],
+            'reorderCount' => $this->components->countReorderNeeded(),
+            'slidesCount' => count($this->slides->listAll()),
             'flash' => $this->pullFlash(),
         ]);
+    }
+
+    public function slides(): void
+    {
+        $this->requireAuth();
+
+        $this->view->render('pages/admin/slides.twig', [
+            'pageTitle' => 'Slide home',
+            'slides' => $this->slides->listAll(),
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+        ]);
+    }
+
+    public function branding(): void
+    {
+        $this->requireAuth();
+
+        $this->view->render('pages/admin/branding.twig', [
+            'pageTitle' => 'Branding',
+            'branding' => $this->branding->globals(),
+            'flash' => $this->pullFlash(),
+        ]);
+    }
+
+    public function menu(): void
+    {
+        $this->requireAuth();
+
+        $parents = $this->menu->listParents();
+        $parentLabels = [];
+        foreach ($parents as $parent) {
+            $parentLabels[(int) $parent['id']] = (string) $parent['label'];
+        }
+
+        $items = array_map(function (array $item) use ($parentLabels): array {
+            $item['parent_label'] = $item['parent_id'] !== null ? ($parentLabels[(int) $item['parent_id']] ?? '') : null;
+            $item['item_type'] = $item['parent_id'] !== null ? 'Sottocategoria' : 'Categoria';
+            return $item;
+        }, $this->menu->listAll());
+
+        $groupedItems = [];
+        foreach ($items as $item) {
+            if ($item['parent_id'] === null) {
+                $groupedItems[] = $item;
+
+                foreach ($items as $child) {
+                    if ((int) ($child['parent_id'] ?? 0) === (int) $item['id']) {
+                        $groupedItems[] = $child;
+                    }
+                }
+            }
+        }
+
+        foreach ($items as $item) {
+            $alreadyIncluded = false;
+            foreach ($groupedItems as $included) {
+                if ((int) $included['id'] === (int) $item['id']) {
+                    $alreadyIncluded = true;
+                    break;
+                }
+            }
+
+            if (!$alreadyIncluded) {
+                $groupedItems[] = $item;
+            }
+        }
+
+        $this->view->render('pages/admin/menu.twig', [
+            'pageTitle' => 'Menu sito',
+            'items' => $groupedItems,
+            'parents' => $parents,
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+        ]);
+    }
+
+    public function pages(): void
+    {
+        $this->requireAuth();
+
+        $this->view->render('pages/admin/pages.twig', [
+            'pageTitle' => 'Pagine',
+            'pages' => $this->pages->listAll(),
+            'flash' => $this->pullFlash(),
+        ]);
+    }
+
+    public function editPage(string $pageId): void
+    {
+        $this->requireAuth();
+
+        $page = $this->pages->findById((int) $pageId);
+        if ($page === null) {
+            $this->flash('error', 'Pagina non trovata.');
+            $this->redirect('/admin/pagine');
+        }
+
+        $this->view->render('pages/admin/page-edit.twig', [
+            'pageTitle' => 'Modifica pagina',
+            'pageItem' => $page,
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+        ]);
+    }
+
+    public function updatePage(string $pageId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->pages->update((int) $pageId, $_POST);
+            $this->flash('success', 'Pagina aggiornata correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/pagine/' . (int) $pageId . '/modifica');
+    }
+
+    public function uploadPageImage(string $pageId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->pages->updateImage((int) $pageId, $_FILES['image'] ?? []);
+            $this->flash('success', 'Immagine pagina aggiornata.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/pagine/' . (int) $pageId . '/modifica');
+    }
+
+    public function editMenuItem(string $itemId): void
+    {
+        $this->requireAuth();
+
+        $item = $this->menu->findById((int) $itemId);
+        if ($item === null) {
+            $this->flash('error', 'Voce menu non trovata.');
+            $this->redirect('/admin/menu');
+        }
+
+        $this->view->render('pages/admin/menu-edit.twig', [
+            'pageTitle' => 'Modifica voce menu',
+            'item' => $item,
+            'parents' => $this->menu->listParents(),
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+        ]);
+    }
+
+    public function storeMenuItem(): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->menu->create($_POST);
+            $this->flash('success', 'Voce menu creata correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/menu');
+    }
+
+    public function updateMenuItem(string $itemId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->menu->update((int) $itemId, $_POST);
+            $this->flash('success', 'Voce menu aggiornata correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/menu/' . (int) $itemId . '/modifica');
+    }
+
+    public function uploadMenuItemImage(string $itemId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->menu->updateImage((int) $itemId, $_FILES['image'] ?? []);
+            $this->flash('success', 'Immagine sottocategoria aggiornata.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/menu/' . (int) $itemId . '/modifica');
+    }
+
+    public function moveMenuItemUp(string $itemId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->menu->moveUp((int) $itemId);
+            $this->flash('success', 'Elemento menu spostato verso l alto.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/menu');
+    }
+
+    public function moveMenuItemDown(string $itemId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->menu->moveDown((int) $itemId);
+            $this->flash('success', 'Elemento menu spostato verso il basso.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/menu');
+    }
+
+    public function deleteMenuItem(string $itemId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->menu->delete((int) $itemId);
+            $this->flash('success', 'Voce menu eliminata.');
+            $this->redirect('/admin/menu');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+            $this->redirect('/admin/menu/' . (int) $itemId . '/modifica');
+        }
+    }
+
+    public function updateBrandingLogo(): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->branding->updateLogo($_FILES['logo'] ?? []);
+            $this->flash('success', 'Logo aggiornato correttamente.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/branding');
+    }
+
+    public function editSlide(string $slideId): void
+    {
+        $this->requireAuth();
+
+        $slide = $this->slides->findById((int) $slideId);
+        if ($slide === null) {
+            $this->flash('error', 'Slide non trovata.');
+            $this->redirect('/admin/slides');
+        }
+
+        $this->view->render('pages/admin/slide-edit.twig', [
+            'pageTitle' => 'Modifica slide',
+            'slide' => $slide,
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+        ]);
+    }
+
+    public function storeSlide(): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->slides->create($_POST);
+            $this->flash('success', 'Slide creata correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/slides');
+    }
+
+    public function updateSlide(string $slideId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->slides->update((int) $slideId, $_POST);
+            $this->flash('success', 'Slide aggiornata correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/slides/' . (int) $slideId . '/modifica');
+    }
+
+    public function deleteSlide(string $slideId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->slides->delete((int) $slideId);
+            $this->flash('success', 'Slide eliminata.');
+            $this->redirect('/admin/slides');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+            $this->redirect('/admin/slides/' . (int) $slideId . '/modifica');
+        }
     }
 
     public function categories(): void
@@ -96,6 +430,20 @@ final class AdminController
             $this->clearOld();
         } catch (Throwable $exception) {
             $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/categorie/' . (int) $categoryId . '/modifica');
+    }
+
+    public function uploadCategoryImage(string $categoryId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->categories->updateImage((int) $categoryId, $_FILES['image'] ?? []);
+            $this->flash('success', 'Immagine categoria aggiornata.');
+        } catch (Throwable $exception) {
             $this->flash('error', $exception->getMessage());
         }
 
@@ -180,6 +528,8 @@ final class AdminController
             'pageTitle' => 'Modifica prodotto',
             'product' => $product,
             'categories' => $this->categories->listAll(),
+            'components' => $this->components->listActive(),
+            'bomItems' => $this->bom->byProductId((int) $product['id']),
             'images' => $this->images->byProductId((int) $product['id']),
             'imageLibrary' => $this->images->listAvailableLibrary(),
             'flash' => $this->pullFlash(),
@@ -215,6 +565,34 @@ final class AdminController
         }
 
         $this->redirect('/admin/prodotti');
+    }
+
+    public function storeBomItem(string $productId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->bom->addItem((int) $productId, $_POST);
+            $this->flash('success', 'Voce distinta base aggiunta.');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/prodotti/' . (int) $productId . '/modifica');
+    }
+
+    public function deleteBomItem(string $bomItemId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $item = $this->bom->removeItem((int) $bomItemId);
+            $this->flash('success', 'Voce distinta base rimossa.');
+            $this->redirect('/admin/prodotti/' . (int) $item['product_id'] . '/modifica');
+        } catch (Throwable $exception) {
+            $this->flash('error', $exception->getMessage());
+            $this->redirect('/admin/prodotti');
+        }
     }
 
     public function uploadProductImage(string $productId): void
@@ -324,6 +702,93 @@ final class AdminController
             'filters' => $filters,
             'flash' => $this->pullFlash(),
         ]);
+    }
+
+    public function components(): void
+    {
+        $this->requireAuth();
+
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+            'stock' => trim((string) ($_GET['stock'] ?? '')),
+        ];
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $pagination = $this->components->paginateForAdmin($filters, $page, 20);
+
+        $this->view->render('pages/admin/components.twig', [
+            'pageTitle' => 'Componenti',
+            'components' => $pagination['items'],
+            'pagination' => $this->buildPagination('/admin/componenti', $filters, $pagination),
+            'filters' => $filters,
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+            'reorderCount' => $this->components->countReorderNeeded(),
+        ]);
+    }
+
+    public function editComponent(string $componentId): void
+    {
+        $this->requireAuth();
+
+        $component = $this->components->findById((int) $componentId);
+        if ($component === null) {
+            $this->flash('error', 'Componente non trovato.');
+            $this->redirect('/admin/componenti');
+        }
+
+        $this->view->render('pages/admin/component-edit.twig', [
+            'pageTitle' => 'Modifica componente',
+            'component' => $component,
+            'flash' => $this->pullFlash(),
+            'old' => $this->pullOld(),
+        ]);
+    }
+
+    public function storeComponent(): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->components->create($_POST);
+            $this->flash('success', 'Componente creato correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/componenti');
+    }
+
+    public function updateComponent(string $componentId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->components->update((int) $componentId, $_POST);
+            $this->flash('success', 'Componente aggiornato correttamente.');
+            $this->clearOld();
+        } catch (Throwable $exception) {
+            $this->rememberOld($_POST);
+            $this->flash('error', $exception->getMessage());
+        }
+
+        $this->redirect('/admin/componenti/' . (int) $componentId . '/modifica');
+    }
+
+    public function deleteComponent(string $componentId): void
+    {
+        $this->requireAuth();
+
+        try {
+            $this->components->delete((int) $componentId);
+            $this->flash('success', 'Componente eliminato.');
+            $this->redirect('/admin/componenti');
+        } catch (Throwable $exception) {
+            $this->flash('error', 'Impossibile eliminare il componente. Verifica che non sia usato in una distinta base.');
+            $this->redirect('/admin/componenti/' . (int) $componentId . '/modifica');
+        }
     }
 
     public function updateContactStatus(string $requestId): void

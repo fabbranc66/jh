@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ pageTitle|default('Admin') }} | {{ app.name }}</title>
-    <link rel="stylesheet" href="{{ app.url }}/assets/css/app.css">
+    <link rel="stylesheet" href="{{ app.url }}/assets/css/app.css?v={{ app.asset_version }}">
 </head>
 <body class="admin-body">
     <header class="admin-header">
@@ -15,6 +15,11 @@
                     <a href="{{ app.url }}/admin">Dashboard</a>
                     <a href="{{ app.url }}/admin/categorie">Categorie</a>
                     <a href="{{ app.url }}/admin/prodotti">Prodotti</a>
+                    <a href="{{ app.url }}/admin/menu">Menu</a>
+                    <a href="{{ app.url }}/admin/pagine">Pagine</a>
+                    <a href="{{ app.url }}/admin/slides">Slide home</a>
+                    <a href="{{ app.url }}/admin/branding">Branding</a>
+                    <a href="{{ app.url }}/admin/componenti">Componenti</a>
                     <a href="{{ app.url }}/admin/contatti">Contatti</a>
                     <a href="{{ app.url }}/">Sito</a>
                     <form method="post" action="{{ app.url }}/admin/logout">
@@ -28,5 +33,6 @@
     <main class="admin-main">
         {% block content %}{% endblock %}
     </main>
+    <script src="{{ app.url }}/assets/js/app.js?v={{ app.asset_version }}"></script>
 </body>
 </html>

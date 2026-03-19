@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ pageTitle|default(app.name) }} | {{ app.name }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{{ pageDescription|default('Catalogo handmade e digital craft con prodotti personalizzati, richiesta diretta e laboratorio creativo.') }}{% endblock %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Lora:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ app.url }}/assets/css/app.css?v={{ app.asset_version }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">

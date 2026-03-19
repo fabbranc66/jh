@@ -1,0 +1,76 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Navigazione</span>
+    <h1>Modifica elemento menu</h1>
+    <p class="section-note">{{ item.parent_id ? 'Sottocategoria del mega menu' : 'Categoria principale del menu' }}</p>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/menu/{{ item.id }}/modifica">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Nome</span>
+                <input type="text" name="label" value="{{ old.label|default(item.label) }}" required>
+            </label>
+            <label>
+                <span>URL</span>
+                <input type="text" name="url" value="{{ old.url|default(item.url) }}" required>
+            </label>
+            <label>
+                <span>Tipo</span>
+                <select name="parent_id">
+                    <option value="0">Categoria principale</option>
+                    {% for parent in parents %}
+                        {% if parent.id != item.id %}
+                            <option value="{{ parent.id }}" {{ old.parent_id|default(item.parent_id|default(0)) == parent.id ? 'selected' : '' }}>Sottocategoria di {{ parent.label }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Ordine</span>
+                <input type="number" name="sort_order" value="{{ old.sort_order|default(item.sort_order) }}">
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : (item.is_active ? 'checked' : '') }}>
+                <span>Elemento attivo</span>
+            </label>
+        </div>
+        <input type="hidden" name="image_path" value="{{ old.image_path|default(item.image_path) }}">
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Salva modifiche</button>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/menu">Torna al menu</a>
+        </div>
+    </form>
+    <form class="admin-inline-form" method="post" action="{{ app.url }}/admin/menu/{{ item.id }}/elimina" onsubmit="return confirm('Eliminare questo elemento menu?');">
+        {% include 'components/csrf.twig' %}
+        <button class="button button--ghost button--small" type="submit">Elimina elemento</button>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Immagine sottocategoria</h2>
+    <p class="section-note">L immagine viene usata nella card del mega menu. Per le categorie principali e facoltativa.</p>
+    {% if item.image_path %}
+        <div class="branding-preview">
+            <img class="branding-preview__image" src="{{ app.url }}/{{ item.image_path }}?v={{ app.asset_version }}" alt="{{ item.label }}">
+        </div>
+    {% endif %}
+    <form class="admin-form admin-form--compact" method="post" enctype="multipart/form-data" action="{{ app.url }}/admin/menu/{{ item.id }}/immagine">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--2 compact-grid--align-end">
+            <label>
+                <span>Nuova immagine</span>
+                <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+            </label>
+            <div class="compact-actions">
+                <button class="button button--small" type="submit">Carica immagine</button>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

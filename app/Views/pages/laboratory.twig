@@ -1,0 +1,113 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+<section class="page-band {{ pageBandClass|default('page-band--laboratory') }}">
+    <div class="page-band__inner {{ page and page.image_path ? 'page-band__inner--media' : '' }}">
+        <div class="page-band__content">
+            <span class="eyebrow">Laboratorio</span>
+            <h1>Un laboratorio creativo tra artigianato e tecnologie digitali.</h1>
+            <p>JH lavora su piccoli oggetti personalizzati, idee regalo, articoli per eventi e progetti su richiesta combinando lavorazioni manuali, resina artistica, stampa 3D e sviluppo di dettagli su misura.</p>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/catalogo">Esplora il catalogo</a>
+                <a class="button button--ghost" href="{{ app.url }}/contatti">Parla del tuo progetto</a>
+            </div>
+        </div>
+        {% if page and page.image_path %}
+            <div class="page-band__media">
+                <img src="{{ app.url }}/{{ page.image_path }}?v={{ app.asset_version }}" alt="Laboratorio JH">
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Come lavora JH</h2>
+        <p>Il laboratorio non nasce per una vendita impersonale, ma per accompagnare la richiesta dal primo dettaglio fino alla definizione del pezzo finale.</p>
+    </div>
+    <div class="grid grid--3">
+        <article class="card card--compact">
+            <h3>Partenza da un'idea</h3>
+            <p>Puoi partire da un prodotto gia presente nel catalogo oppure da un'idea nuova da adattare a colore, nome, occasione o stile.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Proposta su misura</h3>
+            <p>Ogni richiesta puo essere rifinita su materiali, lavorazione, dimensioni, dettagli decorativi e personalizzazioni utili.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Produzione in piccola scala</h3>
+            <p>Il focus e su pezzi curati, piccole serie e articoli che richiedono attenzione, non su produzione standardizzata.</p>
+        </article>
+    </div>
+</section>
+
+<section class="info-band">
+    <div class="section-heading">
+        <h2>Tecniche e linee di lavoro</h2>
+        <p>La struttura del laboratorio e pensata per tenere insieme manualita e strumenti digitali senza perdere identita artigianale.</p>
+    </div>
+    <div class="grid grid--2">
+        <article class="card card--compact">
+            <h3>Area handmade</h3>
+            <div class="stack-list">
+                <p>Wire wrapping per gioielli e dettagli ornamentali.</p>
+                <p>Resina artistica con inclusioni, colori e combinazioni personalizzate.</p>
+                <p>Finiture orientate a idee regalo, ricordi e pezzi unici.</p>
+            </div>
+        </article>
+        <article class="card card--compact">
+            <h3>Area digitale</h3>
+            <div class="stack-list">
+                <p>Stampa 3D per oggetti decorativi, funzionali o personalizzati.</p>
+                <p>Sviluppo di articoli per eventi, supporti, lampade e piccola oggettistica.</p>
+                <p>Base pronta per servizi piu evoluti come scanner 3D, ricostruzione pezzi e sviluppo custom.</p>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Ambiti principali</h2>
+        <p>Le richieste piu naturali per il laboratorio oggi sono queste, con margine per progetti speciali da valutare caso per caso.</p>
+    </div>
+    <div class="grid grid--3">
+        <article class="card card--compact">
+            <h3>Regalo e personalizzazione</h3>
+            <p>Ciondoli, segnalibri, oggetti ricordo, articoli con iniziali, nomi, date o dettagli significativi.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Casa ed eventi</h3>
+            <p>Bomboniere, topper, decorazioni, piccole serie coordinate e oggetti da tavolo o da esposizione.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Progetti speciali</h3>
+            <p>Piccoli concept personalizzati, adattamenti da idea cliente e prototipi creativi da discutere direttamente.</p>
+        </article>
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Perche il contatto diretto</h2>
+        <p>In questa fase il sito funziona come vetrina evoluta: il catalogo ti aiuta a orientarti, ma il valore vero sta nello scambio diretto sulla fattibilita.</p>
+    </div>
+    <div class="grid grid--2">
+        <article class="card card--compact">
+            <h3>Quando conviene</h3>
+            <div class="stack-list">
+                <p>Quando vuoi capire tempi, materiali o personalizzazioni disponibili.</p>
+                <p>Quando il prodotto pubblicato ti piace ma vuoi una variante.</p>
+                <p>Quando parti da un'occasione specifica e non da un articolo gia pronto.</p>
+            </div>
+        </article>
+        <article class="card card--compact">
+            <h3>Cosa fare adesso</h3>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/catalogo">Guarda i prodotti</a>
+                <a class="button button--ghost" href="{{ app.url }}/contatti">Invia una richiesta</a>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

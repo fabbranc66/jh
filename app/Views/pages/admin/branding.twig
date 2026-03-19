@@ -1,0 +1,32 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Aspetto sito</span>
+    <h1>Branding</h1>
+    <p class="section-note">Gestisci il logo visibile nell header pubblico.</p>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <div class="compact-grid compact-grid--2">
+        <div>
+            <span class="admin-field-label">Logo attuale</span>
+            <div class="branding-preview">
+                <img class="branding-preview__image" src="{{ branding.logo_url }}?v={{ app.asset_version }}" alt="Logo attuale">
+            </div>
+            <p class="section-note">Percorso attuale: {{ branding.logo_path }}</p>
+        </div>
+
+        <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/branding/logo" enctype="multipart/form-data">
+            {% include 'components/csrf.twig' %}
+            <label>
+                <span>Nuovo logo</span>
+                <input type="file" name="logo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
+            </label>
+            <p class="section-note">Formati supportati: JPG, PNG, WEBP.</p>
+            <button class="button button--small" type="submit">Aggiorna logo</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

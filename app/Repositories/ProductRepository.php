@@ -37,7 +37,8 @@ final class ProductRepository
                            WHERE pi.product_id = p.id
                            ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.id ASC
                            LIMIT 1
-                       ) AS primary_image_path
+                       ) AS primary_image_path,
+                       p.product_type, p.production_time_hours, p.internal_cost, p.minimum_stock
                 FROM products p
                 INNER JOIN categories c ON c.id = p.category_id ';
         [$whereSql, $params] = $this->buildAdminFilterClause($filters);
@@ -102,6 +103,43 @@ final class ProductRepository
         return $statement->fetchAll();
     }
 
+    public function searchActive(string $query, int $limit = 24): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT p.id, p.name, p.slug, p.sku, p.short_description, p.price_label,
+                    p.is_customizable, p.is_featured, c.name AS category_name, c.slug AS category_slug,
+                    (
+                        SELECT pi.image_path
+                        FROM product_images pi
+                        WHERE pi.product_id = p.id
+                        ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.id ASC
+                        LIMIT 1
+                    ) AS primary_image_path
+             FROM products p
+             INNER JOIN categories c ON c.id = p.category_id
+             WHERE p.status = :status
+               AND c.is_active = 1
+               AND (
+                    p.name LIKE :query_name
+                    OR p.short_description LIKE :query_short
+                    OR p.sku LIKE :query_sku
+                    OR c.name LIKE :query_category
+               )
+             ORDER BY p.is_featured DESC, p.id DESC
+             LIMIT :limit'
+        );
+        $statement->bindValue(':status', 'published');
+        $searchTerm = '%' . $query . '%';
+        $statement->bindValue(':query_name', $searchTerm);
+        $statement->bindValue(':query_short', $searchTerm);
+        $statement->bindValue(':query_sku', $searchTerm);
+        $statement->bindValue(':query_category', $searchTerm);
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
     public function latestActiveByCategory(int $categoryId, int $limit = 24): array
     {
         $statement = $this->pdo->prepare(
@@ -159,8 +197,9 @@ final class ProductRepository
     public function findById(int $id): ?array
     {
         $statement = $this->pdo->prepare(
-            'SELECT p.id, p.category_id, p.name, p.slug, p.sku, p.short_description, p.description,
-                    p.materials, p.technique, p.price_label, p.is_customizable, p.is_featured,
+            'SELECT p.id, p.category_id, p.name, p.slug, p.sku, p.product_type, p.short_description, p.description,
+                    p.materials, p.technique, p.production_time_hours, p.internal_cost, p.minimum_stock,
+                    p.internal_notes, p.price_label, p.is_customizable, p.is_featured,
                     p.whatsapp_enabled, p.telegram_enabled, p.share_enabled, p.status
              FROM products p
              WHERE p.id = :id
@@ -180,10 +219,15 @@ final class ProductRepository
                  name = :name,
                  slug = :slug,
                  sku = :sku,
+                 product_type = :product_type,
                  short_description = :short_description,
                  description = :description,
                  materials = :materials,
                  technique = :technique,
+                 production_time_hours = :production_time_hours,
+                 internal_cost = :internal_cost,
+                 minimum_stock = :minimum_stock,
+                 internal_notes = :internal_notes,
                  price_label = :price_label,
                  is_customizable = :is_customizable,
                  is_featured = :is_featured,
@@ -200,10 +244,15 @@ final class ProductRepository
             'name' => $data['name'],
             'slug' => $data['slug'],
             'sku' => $data['sku'],
+            'product_type' => $data['product_type'],
             'short_description' => $data['short_description'],
             'description' => $data['description'],
             'materials' => $data['materials'],
             'technique' => $data['technique'],
+            'production_time_hours' => $data['production_time_hours'],
+            'internal_cost' => $data['internal_cost'],
+            'minimum_stock' => $data['minimum_stock'],
+            'internal_notes' => $data['internal_notes'],
             'price_label' => $data['price_label'],
             'is_customizable' => $data['is_customizable'],
             'is_featured' => $data['is_featured'],
@@ -218,10 +267,12 @@ final class ProductRepository
     {
         $statement = $this->pdo->prepare(
             'INSERT INTO products (
-                category_id, name, slug, sku, short_description, description, materials, technique,
+                category_id, name, slug, sku, product_type, short_description, description, materials, technique,
+                production_time_hours, internal_cost, minimum_stock, internal_notes,
                 price_label, is_customizable, is_featured, whatsapp_enabled, telegram_enabled, share_enabled, status
              ) VALUES (
-                :category_id, :name, :slug, :sku, :short_description, :description, :materials, :technique,
+                :category_id, :name, :slug, :sku, :product_type, :short_description, :description, :materials, :technique,
+                :production_time_hours, :internal_cost, :minimum_stock, :internal_notes,
                 :price_label, :is_customizable, :is_featured, :whatsapp_enabled, :telegram_enabled, :share_enabled, :status
              )'
         );
@@ -231,10 +282,15 @@ final class ProductRepository
             'name' => $data['name'],
             'slug' => $data['slug'],
             'sku' => $data['sku'],
+            'product_type' => $data['product_type'],
             'short_description' => $data['short_description'],
             'description' => $data['description'],
             'materials' => $data['materials'],
             'technique' => $data['technique'],
+            'production_time_hours' => $data['production_time_hours'],
+            'internal_cost' => $data['internal_cost'],
+            'minimum_stock' => $data['minimum_stock'],
+            'internal_notes' => $data['internal_notes'],
             'price_label' => $data['price_label'],
             'is_customizable' => $data['is_customizable'],
             'is_featured' => $data['is_featured'],

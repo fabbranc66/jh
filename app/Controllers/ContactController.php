@@ -6,20 +6,25 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Services\ContactService;
+use App\Services\PageService;
 use Throwable;
 
 final class ContactController
 {
     public function __construct(
         private View $view,
-        private ContactService $contacts
+        private ContactService $contacts,
+        private PageService $pages
     ) {
     }
 
     public function index(): void
     {
+        $page = $this->pages->findBySlug('contatti');
+
         $this->view->render('pages/contact.twig', [
             'pageTitle' => 'Contatti',
+            'page' => $page,
             'flash' => $this->pullFlash(),
             'old' => $this->pullOld(),
         ]);

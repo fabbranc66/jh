@@ -13,7 +13,7 @@
     <h3>{{ product.name }}</h3>
     <p>{{ product.short_description ?: 'Prodotto artigianale e digitale su richiesta.' }}</p>
     <div class="card__footer">
-        <span>{{ product.price_label ?: 'Prezzo su richiesta' }}</span>
-        <a href="{{ app.url }}/prodotto/{{ product.slug }}">Apri scheda</a>
+        <span class="card__price">{{ product.price_label ?: 'Prezzo su richiesta' }}</span>
+        <a href="{{ app.url }}/prodotto/{{ product.slug }}">Scopri</a>
     </div>
 </article>

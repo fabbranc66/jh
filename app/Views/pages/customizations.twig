@@ -1,0 +1,79 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+<section class="page-band {{ pageBandClass|default('page-band--custom') }}">
+    <div class="page-band__inner {{ page and page.image_path ? 'page-band__inner--media' : '' }}">
+        <div class="page-band__content">
+            <span class="eyebrow">Personalizzazioni</span>
+            <h1>Prodotti personalizzabili e richieste su misura.</h1>
+            <p>Molte creazioni JH possono essere adattate per stile, colori, nomi, iniziali, ricorrenze, dettagli decorativi e piccoli concept sviluppati insieme.</p>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/contatti">Richiedi una personalizzazione</a>
+                <a class="button button--ghost" href="{{ app.url }}/catalogo">Esplora il catalogo</a>
+            </div>
+        </div>
+        {% if page and page.image_path %}
+            <div class="page-band__media">
+                <img src="{{ app.url }}/{{ page.image_path }}?v={{ app.asset_version }}" alt="Personalizzazioni JH">
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Cosa puoi personalizzare</h2>
+        <p>La personalizzazione non riguarda solo l'estetica: puo coinvolgere anche funzione, formato e destinazione d'uso.</p>
+    </div>
+    <div class="grid grid--3">
+        <article class="card card--compact">
+            <h3>Testi e simboli</h3>
+            <p>Nomi, iniziali, date, frasi brevi, dediche e dettagli simbolici legati a un ricordo o a un evento.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Colori e materiali</h3>
+            <p>Finiture, palette, resine, inserti, pietre, combinazioni wire e materiali decorativi scelti in base al progetto.</p>
+        </article>
+        <article class="card card--compact">
+            <h3>Uso finale</h3>
+            <p>Regalo, evento, coordinato, oggetto casa, accessorio tecnico o piccolo pezzo sviluppato per una richiesta specifica.</p>
+        </article>
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Linee piu adatte</h2>
+        <p>Alcune categorie si prestano particolarmente bene alle richieste personalizzate.</p>
+    </div>
+    <div class="grid grid--3">
+        <article class="card">
+            <span class="pill">Gioielli</span>
+            <h3>Wire e resina</h3>
+            <p>Ciondoli, orecchini, anelli e piccoli pezzi da adattare per colore, forma o significato.</p>
+            <div class="card__footer">
+                <span>Dettagli su misura</span>
+                <a href="{{ app.url }}/categoria/gioielli-wire">Vai ai gioielli</a>
+            </div>
+        </article>
+        <article class="card">
+            <span class="pill">Eventi</span>
+            <h3>Bomboniere e ricordi</h3>
+            <p>Piccole serie coordinate per matrimoni, battesimi, comunioni, cresime e occasioni speciali.</p>
+            <div class="card__footer">
+                <span>Serie coordinate</span>
+                <a href="{{ app.url }}/categoria/eventi">Vai agli eventi</a>
+            </div>
+        </article>
+        <article class="card">
+            <span class="pill">Smart & 3D</span>
+            <h3>Oggetti speciali</h3>
+            <p>Tag NFC, stampa 3D, miniature e componenti sviluppati partendo da una richiesta piu tecnica.</p>
+            <div class="card__footer">
+                <span>Idea personalizzata</span>
+                <a href="{{ app.url }}/categoria/smart-objects">Vai alla linea smart</a>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

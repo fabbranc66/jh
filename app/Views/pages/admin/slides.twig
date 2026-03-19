@@ -1,0 +1,82 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Homepage</span>
+    <h1>Slideshow hero</h1>
+    <p class="section-note">Tre o piu slide con immagine, testo e link prodotto o categoria.</p>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <h2>Nuova slide</h2>
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/slides">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Titolo</span>
+                <input type="text" name="title" value="{{ old.title|default('') }}" required>
+            </label>
+            <label>
+                <span>Bottone</span>
+                <input type="text" name="button_label" value="{{ old.button_label|default('Scopri') }}" required>
+            </label>
+            <label>
+                <span>Ordine</span>
+                <input type="number" name="sort_order" value="{{ old.sort_order|default('0') }}">
+            </label>
+        </div>
+        <label>
+            <span>Sottotitolo</span>
+            <input type="text" name="subtitle" value="{{ old.subtitle|default('') }}">
+        </label>
+        <div class="compact-grid compact-grid--2">
+            <label>
+                <span>URL immagine</span>
+                <input type="url" name="image_url" value="{{ old.image_url|default('') }}" required>
+            </label>
+            <label>
+                <span>Link destinazione</span>
+                <input type="text" name="link_url" value="{{ old.link_url|default('/catalogo') }}" required>
+            </label>
+        </div>
+        <label class="checkbox">
+            <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : 'checked' }}>
+            <span>Slide attiva</span>
+        </label>
+        <button class="button button--small" type="submit">Crea slide</button>
+    </form>
+</section>
+
+<section class="section-tight">
+    <h2>Slide attuali</h2>
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Ordine</th>
+                    <th>Anteprima</th>
+                    <th>Titolo</th>
+                    <th>Link</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for slide in slides %}
+                    <tr>
+                        <td>{{ slide.sort_order }}</td>
+                        <td><img class="admin-thumb admin-thumb--list" src="{{ slide.image_url }}" alt="{{ slide.title }}"></td>
+                        <td><a class="pill pill--link" href="{{ app.url }}/admin/slides/{{ slide.id }}/modifica">{{ slide.title }}</a></td>
+                        <td>{{ slide.link_url }}</td>
+                        <td>{{ slide.is_active ? 'Attiva' : 'Off' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">Nessuna slide presente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -28,6 +28,19 @@
             <p>{{ contactsCount }} richieste salvate dal form pubblico.</p>
             <a class="button" href="{{ app.url }}/admin/contatti">Apri richieste</a>
         </article>
+        <article class="card">
+            <h2>Componenti</h2>
+            <p>{{ componentsCount }} materiali e componenti censiti.</p>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/admin/componenti">Apri componenti</a>
+                <span class="pill">{{ reorderCount }} da riordinare</span>
+            </div>
+        </article>
+        <article class="card">
+            <h2>Slide home</h2>
+            <p>{{ slidesCount }} slide gestiscono il grande visual della homepage.</p>
+            <a class="button" href="{{ app.url }}/admin/slides">Gestisci slideshow</a>
+        </article>
     </div>
 </section>
 {% endblock %}

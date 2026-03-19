@@ -1,10 +1,23 @@
 {% extends 'layouts/base.twig' %}
 
 {% block content %}
-<section class="hero hero--compact">
-    <span class="eyebrow">Pagina</span>
-    <h1>{{ page.title }}</h1>
-    <p>{{ page.meta_description ?: 'Contenuto informativo del progetto.' }}</p>
+<section class="page-band {{ pageBandClass|default('page-band--catalog') }}">
+    <div class="page-band__inner {{ page.image_path ? 'page-band__inner--media' : '' }}">
+        <div class="page-band__content">
+            <span class="eyebrow">Scopri</span>
+            <h1>{{ page.title }}</h1>
+            <p>{{ page.meta_description ?: 'Contenuto informativo del progetto.' }}</p>
+            <div class="hero__actions">
+                <a class="button" href="{{ app.url }}/catalogo">Vai al catalogo</a>
+                <a class="button button--ghost" href="{{ app.url }}/contatti">Richiedi informazioni</a>
+            </div>
+        </div>
+        {% if page.image_path %}
+            <div class="page-band__media">
+                <img src="{{ app.url }}/{{ page.image_path }}?v={{ app.asset_version }}" alt="{{ page.title }}">
+            </div>
+        {% endif %}
+    </div>
 </section>
 
 <section>
@@ -12,4 +25,18 @@
         <p>{{ page.content }}</p>
     </div>
 </section>
+
+{% if relatedProducts is defined and relatedProducts %}
+<section>
+    <div class="section-heading">
+        <h2>Articoli correlati</h2>
+        <p>Una selezione di prodotti coerenti con questa sezione, utile per approfondire la linea.</p>
+    </div>
+    <div class="grid grid--3">
+        {% for product in relatedProducts %}
+            {% include 'components/product-card.twig' with { product: product } %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}

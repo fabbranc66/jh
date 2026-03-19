@@ -1,0 +1,90 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block content %}
+<section>
+    <span class="eyebrow">Operativo</span>
+    <h1>Modifica componente</h1>
+    <p class="section-note">Scheda tecnica, giacenza, soglia riordino e riferimento acquisto.</p>
+    {% include 'components/flash.twig' %}
+</section>
+
+<section class="section-tight">
+    <form class="admin-form admin-form--compact" method="post" action="{{ app.url }}/admin/componenti/{{ component.id }}/modifica">
+        {% include 'components/csrf.twig' %}
+        <div class="compact-grid compact-grid--3">
+            <label>
+                <span>Codice</span>
+                <input type="text" name="code" value="{{ old.code|default(component.code) }}" required>
+            </label>
+            <label>
+                <span>Nome</span>
+                <input type="text" name="name" value="{{ old.name|default(component.name) }}" required>
+            </label>
+            <label>
+                <span>Categoria</span>
+                <input type="text" name="category" value="{{ old.category|default(component.category) }}">
+            </label>
+            <label>
+                <span>Unita</span>
+                <input type="text" name="unit" value="{{ old.unit|default(component.unit) }}">
+            </label>
+            <label>
+                <span>Giacenza attuale</span>
+                <input type="number" step="0.001" name="current_stock" value="{{ old.current_stock|default(component.current_stock) }}">
+            </label>
+            <label>
+                <span>Soglia riordino</span>
+                <input type="number" step="0.001" name="reorder_level" value="{{ old.reorder_level|default(component.reorder_level) }}">
+            </label>
+            <label>
+                <span>Confezione</span>
+                <input type="number" step="0.001" name="pack_quantity" value="{{ old.pack_quantity|default(component.pack_quantity) }}">
+            </label>
+            <label>
+                <span>Ultimo prezzo</span>
+                <input type="number" step="0.01" name="last_price" value="{{ old.last_price|default(component.last_price) }}">
+            </label>
+            <label>
+                <span>Lead time giorni</span>
+                <input type="number" name="lead_time_days" value="{{ old.lead_time_days|default(component.lead_time_days) }}">
+            </label>
+            <label>
+                <span>Fornitore</span>
+                <input type="text" name="supplier_name" value="{{ old.supplier_name|default(component.supplier_name) }}">
+            </label>
+            <label>
+                <span>Codice fornitore</span>
+                <input type="text" name="supplier_sku" value="{{ old.supplier_sku|default(component.supplier_sku) }}">
+            </label>
+            <label>
+                <span>Ubicazione</span>
+                <input type="text" name="location" value="{{ old.location|default(component.location) }}">
+            </label>
+            <label class="compact-grid">
+                <span>Link acquisto</span>
+                <input type="url" name="purchase_url" value="{{ old.purchase_url|default(component.purchase_url) }}">
+            </label>
+        </div>
+        <label>
+            <span>Descrizione</span>
+            <textarea name="description" rows="3">{{ old.description|default(component.description) }}</textarea>
+        </label>
+        <label>
+            <span>Note interne</span>
+            <textarea name="notes" rows="4">{{ old.notes|default(component.notes) }}</textarea>
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" name="is_active" {{ old ? (old.is_active is defined ? 'checked' : '') : (component.is_active ? 'checked' : '') }}>
+            <span>Componente attivo</span>
+        </label>
+        <div class="hero__actions">
+            <button class="button button--small" type="submit">Salva componente</button>
+            <a class="button button--ghost button--small" href="{{ app.url }}/admin/componenti">Torna ai componenti</a>
+        </div>
+    </form>
+    <form class="admin-inline-form" method="post" action="{{ app.url }}/admin/componenti/{{ component.id }}/elimina" onsubmit="return confirm('Eliminare questo componente?');">
+        {% include 'components/csrf.twig' %}
+        <button class="button button--ghost button--small" type="submit">Elimina componente</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+Options -Indexes
+RewriteEngine On
+
+# Prevent direct web access to application and dependency directories.
+RewriteRule ^(app|config|storage|vendor)(/|$) - [F,L,NC]
+RewriteRule ^(\.env|composer\.(json|lock)|database\.sql)$ - [F,L,NC]
+
+# Serve public assets and uploads from the internal public directory.
+RewriteRule ^(assets|upload)/(.*)$ public/$1/$2 [L]
+RewriteRule ^favicon\.ico$ public/favicon.ico [L]
+RewriteRule ^robots\.txt$ public/robots.txt [L]
+
+# Let existing files/directories at the web root pass through.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route all application requests through the root front controller.
+RewriteRule ^ index.php [QSA,L]
